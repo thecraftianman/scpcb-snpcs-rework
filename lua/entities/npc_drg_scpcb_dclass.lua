@@ -2,7 +2,7 @@ if not DrGBase then return end -- return if DrGBase isn't installed
 ENT.Base = "drgbase_nextbot" -- DO NOT TOUCH (obviously)
 
 -- Misc --
-ENT.PrintName = "SCP-173"
+ENT.PrintName = "Class D"
 ENT.Category = "SCP:CB"
 ENT.Models = { "models/cpthazama/scp/dclass.mdl" }
 ENT.Skins = { 0, 1, 2 }
@@ -19,12 +19,12 @@ ENT.MinFallDamage = 10
 
 -- Sounds --
 ENT.OnSpawnSounds = {}
-ENT.OnIdleSounds = {}
-ENT.IdleSoundDelay = 2
+ENT.OnIdleSounds = { "cpthazama/scp/dclass/dontlikethis.mp3" }
+ENT.IdleSoundDelay = math.random( 30, 60 )
 ENT.ClientIdleSounds = false
-ENT.OnDamageSounds = { "cpthazama/scp/D9341/breath0.mp3","cpthazama/scp/D9341/breath1.mp3","cpthazama/scp/D9341/breath2.mp3","cpthazama/scp/D9341/breath3.mp3","cpthazama/scp/D9341/breath4.mp3" }
+ENT.OnDamageSounds = { "cpthazama/scp/d9341/breath0.mp3", "cpthazama/scp/d9341/breath1.mp3", "cpthazama/scp/d9341/breath2.mp3", "cpthazama/scp/d9341/breath3.mp3", "cpthazama/scp/d9341/breath4.mp3" }
 ENT.DamageSoundDelay = 0.25
-ENT.OnDeathSounds = { "cpthazama/scp/dclass/Gasp.mp3" }
+ENT.OnDeathSounds = { "cpthazama/scp/dclass/gasp.mp3" }
 ENT.OnDownedSounds = {}
 ENT.Footsteps = {}
 
@@ -125,7 +125,7 @@ if SERVER then
 		if not CurTime() > self.NextDoorT then return end
 		for _,v in ipairs( ents.FindInSphere( self:GetPos(), SCP_DoorOpenDistance ) ) do
 			if not v:IsValid() then return end
-			if v:GetClass() != "func_door" then return end
+			if not v:DrG_IsDoor() then return end
 			v:Fire( "Open" )
 		end
 		self.NextDoorT = CurTime() + math.Rand( 1, 3 )
