@@ -1,8 +1,8 @@
-/*--------------------------------------------------
+--[[--------------------------------------------------
 	Copyright (c) 2019 by Cpt. Hazama, All rights reserved.
 	Nothing in these files or/and code may be reproduced, adapted, merged or
 	modified without prior written consent of the original author, Cpt. Hazama
---------------------------------------------------*/
+--------------------------------------------------]]--
 include('server/cpt_utilities.lua')
 
 CPTBASE_TBL_SCPMAPVECTORS = { -- Don't touch these
@@ -20,53 +20,48 @@ if SERVER then
 	NEXTMNT = 0
 end
 
-hook.Add("PlayerUse","CPTBase_SCP_106Containtment",function(ply,ent)
-	if util.IsSCPMap() then
-		if IsValid(ent) then
-			if ent:GetName() == "sound_lever_106" then
-				if CurTime() > NEXTSTT then
-					if ST_FEMUR == false then
-						ST_FEMUR = true
-					else
-						ST_FEMUR = false
-					end
-					NEXTSTT = CurTime() +1
-				end
-			end
-			if ent:GetName() == "magnet_lever_106" then
-				if CurTime() > NEXTMNT then
-					if MN_FEMUR == false then
-						MN_FEMUR = true
-					else
-						MN_FEMUR = false
-					end
-					NEXTMNT = CurTime() +1
-				end
-			end
-			if ent:GetName() == "femur_button" && !FEMURACTIVATED then
-				if CurTime() > NEXTFMT then
-					if ST_FEMUR == true && MN_FEMUR == true then
-						timer.Simple(10,function()
-							if MN_FEMUR == true && FEMURACTIVATED == true then
-								for _,v in ipairs(ents.GetAll()) do
-									if v:IsNPC() && v:GetClass() == "npc_cpt_scp_106" then
-										v:StopCompletely()
-										v:BeContained()
-									end
-								end
-							end
-						end)
-						FEMURACTIVATED = true
-						timer.Simple(40,function()
-							if FEMURACTIVATED == true then
-								FEMURACTIVATED = false
-							end
-						end)
-					end
-					NEXTFMT = CurTime() +1
-				end
-			end
+hook.Add("PlayerUse","CPTBase_SCP_106Containment",function(ply,ent)
+	if not util.IsSCPMap() then return end
+	if not IsValid(ent) then return end
+	if ent:GetName() == "sound_lever_106" then
+	if CurTime() <= NEXTSTT then return end
+		if ST_FEMUR == false then
+			ST_FEMUR = true
+		else
+			ST_FEMUR = false
 		end
+		NEXTSTT = CurTime() +1
+	end
+	if ent:GetName() == "magnet_lever_106" then
+		if CurTime() <= NEXTMNT then return end
+		if MN_FEMUR == false then
+			MN_FEMUR = true
+		else
+			MN_FEMUR = false
+		end
+		NEXTMNT = CurTime() +1
+	end
+	if ent:GetName() == "femur_button" and not FEMURACTIVATED then
+		if CurTime() <= NEXTFMT then return end
+		if ST_FEMUR == true && MN_FEMUR == true then
+			timer.Simple(10,function()
+				if MN_FEMUR == true && FEMURACTIVATED == true then
+					for _,v in ipairs(ents.GetAll()) do
+						if v:IsNPC() && v:GetClass() == "npc_cpt_scp_106" then
+							v:StopCompletely()
+							v:BeContained()
+						end
+					end
+				end
+			end)
+			FEMURACTIVATED = true
+			timer.Simple(40,function()
+				if FEMURACTIVATED == true then
+					FEMURACTIVATED = false
+				end
+			end)
+		end
+		NEXTFMT = CurTime() +1
 	end
 end)
 
@@ -103,7 +98,7 @@ function util.IsSite19()
 	return false
 end
 
-hook.Add("PlayerSay","CPTBase_SCP_CommandsChat",function(ply,spoke)
+--[[ hook.Add("PlayerSay","CPTBase_SCP_CommandsChat",function(ply,spoke)
 	local lowered = string.lower(spoke)
 	if ply:GetNWBool("SCP_HasNightvision") && lowered == "!removenvg" then
 		ply:SetNWBool("SCP_HasNightvision",false)
@@ -113,4 +108,4 @@ hook.Add("PlayerSay","CPTBase_SCP_CommandsChat",function(ply,spoke)
 		ply:SetNWBool("SCP_Has178",false)
 		ply:ChatPrint("You take off the 3D glasses.")
 	end
-end)
+end) ]]--
