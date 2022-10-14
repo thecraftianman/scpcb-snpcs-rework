@@ -30,6 +30,8 @@ ENT.tbl_Sounds = {
 }
 
 ENT.tbl_Capabilities = {CAP_OPEN_DOORS,CAP_USE}
+
+local SCP_SightAngle = 50
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:SetInit()
 	self:SetMovementType(MOVETYPE_STEP)
