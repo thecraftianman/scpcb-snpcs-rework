@@ -53,11 +53,14 @@ end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 hook.Add("Think","CPTBase_SCP_1048a_Think",function()
 	for _,v in ipairs(player.GetAll()) do
-		if v:IsValid() && v:IsPlayer() && v:Alive() && v.SCP_Inflicted_1048a == true then
-			for i = 0,v:GetBoneCount() -1 do
-				if math.random(1,250) == 1 && v:GetBonePosition(i) != v:GetPos() then
-					ParticleEffect("blood_impact_red_01",v:GetBonePosition(i),Angle(0,0,0),nil)
-				end
+		if not v:IsValid() then return end
+		if not v:IsPlayer() then return end
+		if v:Health() <= 0 then return end
+		if not v.SCP_Inflicted_1048a then return end
+
+		for i = 0,v:GetBoneCount() -1 do
+			if math.random(1,250) == 1 and v:GetBonePosition(i) ~= v:GetPos() then
+				ParticleEffect("blood_impact_red_01",v:GetBonePosition(i),Angle(0,0,0),nil)
 			end
 		end
 	end

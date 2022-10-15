@@ -109,39 +109,6 @@ local SCP_SightAngle = 50
 SCP_GlobalNTFCoolDown = 0
 SCP_DoorOpenDistance = 100
 
-hook.Add( "OnEntityCreated", "CPTBase_SCP_SpawnData_NPCs", function( ent )
-	if not ent:IsNPC() then return end
-	ent.SCP_Infected_008 = false
-	ent.SCP_IsBlinking = false
-	ent.SCP_BlinkTime = CurTime() + math.random( 4, 7 )
-end )
-
-hook.Add( "Think", "CPTBase_SCP_ZombieDeathFollow", function()
-	for _, v in ipairs( player.GetAll() ) do
-		if v:Alive() then return end
-		if not IsValid( v.CPTBase_SCP_Zombie ) then return end
-		-- v:SetPos(v.CPTBase_SCP_Zombie:GetPos() +v.CPTBase_SCP_Zombie:OBBCenter())
-		if not v.SCP_SpawnedZombieEntity then
-			v.SCP_ZombieEntity = ents.Create( "prop_dynamic" )
-			v.SCP_ZombieEntity:SetPos( v.CPTBase_SCP_Zombie:GetPos() + v.CPTBase_SCP_Zombie:OBBCenter() )
-			v.SCP_ZombieEntity:SetModel( "models/props_junk/watermelon01_chunk02c.mdl" )
-			v.SCP_ZombieEntity:SetParent( v.CPTBase_SCP_Zombie )
-			v.SCP_ZombieEntity:SetRenderMode( RENDERMODE_TRANSALPHA )
-			v.SCP_ZombieEntity:Spawn()
-			v.SCP_ZombieEntity:SetColor( Color( 0, 0, 0, 0 ) )
-			v.SCP_ZombieEntity:SetNoDraw( false )
-			v.SCP_ZombieEntity:DrawShadow( false )
-			v.SCP_ZombieEntity:DeleteOnRemove( v.CPTBase_SCP_Zombie )
-			v.SCP_SpawnedZombieEntity = true
-		end
-		if IsValid( v.SCP_ZombieEntity ) then
-			v:Spectate( OBS_MODE_CHASE )
-			v:SpectateEntity( v.SCP_ZombieEntity )
-			v:SetMoveType( MOVETYPE_OBSERVER )
-		end
-	end
-end )
-
 function NPC_Meta:SCP_IsPlayerBlinking()
 	for _, v in ipairs( player.GetAll() ) do
 		if not v:IsPlayer() then return end
@@ -199,28 +166,27 @@ end
 function NPC_Meta:SCP_CanBeSeen_NPC()
 	local tb = {}
 
-	for _, v in ipairs( ents.GetAll() ) do
-		if not v:IsNPC() then return end
-		if not v:Visible( self ) then return end
+	for _, v in ipairs( ents.FindByClass( "npc_*" ) ) do
+		if v:IsNPC() and v:Visible( self ) then
+			local npcDiffEnt = v ~= self
+			local npcNotBullseye = v:GetClass() ~= "npc_bullseye" -- Rework note: Why are Bullseyes a particular exception to this check?
+			local npcRelations = self:Disposition(v) ~= D_LI
+			local npcDiffClass = v:GetClass() ~= self:GetClass()
 
-		local npcDiffEnt = v ~= self
-		local npcNotBullseye = v:GetClass() ~= "npc_bullseye" -- Rework note: Why are Bullseyes a particular exception to this check?
-		local npcRelations = self:Disposition(v) ~= D_LI
-		local npcDiffClass = v:GetClass() ~= self:GetClass()
+			local scpSightAngTrig = math.cos( math.rad( SCP_SightAngle ) )
+			local scpVec = self:GetPos() + self:OBBCenter() + self:GetForward() * -30 -- Rework note: What is this magic number here for?
+			local scpVecRel = scpVec - v:GetPos() + v:OBBCenter()
+			local npcScpDotVec = v:GetForward():Dot( scpVecRel:GetNormalized() )
+			local npcVisCheck = npcScpDotVec > scpSightAngTrig
 
-		local scpSightAngTrig = math.cos( math.rad( SCP_SightAngle ) )
-		local scpVec = self:GetPos() + self:OBBCenter() + self:GetForward() * -30 -- Rework note: What is this magic number here for?
-		local scpVecRel = scpVec - v:GetPos() + v:OBBCenter()
-		local npcScpDotVec = v:GetForward():Dot( scpVecRel:GetNormalized() )
-		local npcVisCheck = npcScpDotVec > scpSightAngTrig
-
-		if npcDiffEnt and not v.SCP_IsBlinking and npcNotBullseye and npcRelations and npcDiffClass and v:Visible( self ) and npcVisCheck then
-			if not table.HasValue( tb ) then
-				table.insert( tb, v )
-			end
-		else
-			if table.HasValue( tb ) and tb[v] ~= nil then
-				tb[v] = nil
+			if npcDiffEnt and not v.SCP_IsBlinking and npcNotBullseye and npcRelations and npcDiffClass and v:Visible( self ) and npcVisCheck then
+				if not table.HasValue( tb ) then
+					table.insert( tb, v )
+				end
+			else
+				if table.HasValue( tb ) and tb[v] ~= nil then
+					tb[v] = nil
+				end
 			end
 		end
 	end
