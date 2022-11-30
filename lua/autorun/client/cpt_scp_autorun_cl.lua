@@ -142,6 +142,23 @@ hook.Add( "HUDPaint", "CPTBase_SCP_SetBlinkTexture", function()
 	end
 end )
 
+net.Receive( "SCP_1048_Bleed", function() -- Rework note: This new way functions but spawns way too many particles and needs to be fixed!
+	local hitPlys = net.ReadTable()
+	--PrintTable(hitPlys)
+	timer.Create( "SCP_1048_BleedEffect", 1, 24, function()
+		for _, v in ipairs( hitPlys ) do
+			if not IsValid( v ) then return end
+      		if v:Health() <= 0 then return end
+      		if v.SCP_Inflicted_1048a == false then return end
+			for i = 0, v:GetBoneCount() - 1 do
+				if v:GetBonePosition( i ) ~= v:GetPos() then
+					ParticleEffect( "blood_impact_red_01", v:GetBonePosition( i ), Angle( 0, 0, 0 ), v )
+				end
+			end
+		end
+	end )
+end )
+
 	-- Menu + ConVars --
 
 CPTBase.AddClientVar( "cpt_scp_blinkmessage", "0", true )

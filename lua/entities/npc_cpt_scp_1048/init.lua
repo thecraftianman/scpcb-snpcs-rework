@@ -1,6 +1,8 @@
-if !CPTBase then return end
+if not CPTBase then return end
 AddCSLuaFile('shared.lua')
 include('shared.lua')
+
+util.AddNetworkString("SCP_1048_Bleed")
 
 ENT.ModelTable = {"models/cpthazama/scp/1048.mdl"}
 ENT.StartHealth = 200
@@ -51,37 +53,47 @@ function ENT:HandleEvents(...)
 	end
 end
 ---------------------------------------------------------------------------------------------------------------------------------------------
-hook.Add("Think","CPTBase_SCP_1048a_Think",function()
+--[[hook.Add("Think","CPTBase_SCP_1048a_Think",function()
 	for _,v in ipairs(player.GetAll()) do
-		if not v:IsValid() then return end
-		if not v:IsPlayer() then return end
-		if v:Health() <= 0 then return end
-		if not v.SCP_Inflicted_1048a then return end
-
-		for i = 0,v:GetBoneCount() -1 do
-			if math.random(1,250) == 1 and v:GetBonePosition(i) ~= v:GetPos() then
-				ParticleEffect("blood_impact_red_01",v:GetBonePosition(i),Angle(0,0,0),nil)
+		if not IsValid(v) then return end
+      	if v:Health() <= 0 then return end
+      	if v.SCP_Inflicted_1048a then
+			for i = 0,v:GetBoneCount() -1 do
+				if math.random(1,250) == 1 && v:GetBonePosition(i) ~= v:GetPos() then
+					ParticleEffect("blood_impact_red_01",v:GetBonePosition(i),Angle(0,0,0),v)
+				end
 			end
-		end
+        end
 	end
-end)
+end)]]
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnHitEntity(hitents,hitpos)
+	local hitPlys = {}
 	for _,v in ipairs(hitents) do
-		if v:IsValid() && v:IsPlayer() && v:Alive() && v.SCP_Has714 == false && v.SCP_Inflicted_1048a == false then
+		if not IsValid(v) then return end
+    	if not v:IsPlayer() then return end
+    	if v:Health() <= 0 then return end
+    	if v.SCP_Has714 ~= false then return end
+		if not hitPlys[v] then table.insert(hitPlys, v) end
+		if v.SCP_Inflicted_1048a == false then
 			v.SCP_Inflicted_1048a = true
-			v:ChatPrint("Your body begins to melt and your trachea becomes filled with human ears..")
-			v:EmitSound("cpthazama/scp/1048a/Growth.mp3",75,100)
+      		--table.insert(hitPlys, v)
+			v:ChatPrint("Your body begins to melt and your trachea becomes filled with human ears...")
+			v:EmitSound("cpthazama/scp/1048a/growth.mp3",75,100)
 			local deaths = v:Deaths()
 			timer.Simple(24,function()
 				if v:IsValid() && v.SCP_Inflicted_1048a then
 					if v:Deaths() > deaths then return end
-					v:ChatPrint("You die from choking on all the human ears down your throat..")
+					v:ChatPrint("You die from choking on all the human ears down your throat...")
 					v:Kill()
 				end
 			end)
 		end
 	end
+
+	net.Start("SCP_1048_Bleed")
+		net.WriteTable(hitPlys)
+	net.Broadcast()
 end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnThink()

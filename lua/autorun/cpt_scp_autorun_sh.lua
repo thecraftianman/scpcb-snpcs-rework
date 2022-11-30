@@ -5,6 +5,8 @@
 --------------------------------------------------]]--
 -- if !CPTBase.IsAddonUpdated("cptbase","54") then return end
 
+local IsValid = IsValid
+
 CPTBase.RegisterMod( "SCP:CB SNPCs", "0.2.1" )
 -- CPTBase.AddAddon("scp","10")
 
@@ -87,9 +89,9 @@ CPTBase.AddNPC( "Nightvision Goggles", "ent_cpt_scp_nightvision", category ) -- 
 
 	-- Custom Functions --
 
-local IsValid = IsValid
 local NPC_Meta = FindMetaTable( "NPC" )
 local SCP_SightAngle = 50
+local scpSightAngTrig = math.cos( math.rad( SCP_SightAngle ) )
 SCP_GlobalNTFCoolDown = 0
 SCP_DoorOpenDistance = 100
 
@@ -106,6 +108,7 @@ end
 
 function NPC_Meta:SCP_CanBeSeenData()
 	local tb = {}
+	local scpVec = self:GetPos() + self:OBBCenter() + self:GetForward() * -30 -- Rework note: What is this magic number here for?
 
 	for _, v in ipairs( player.GetAll() ) do
 		if GetConVarNumber( "ai_ignoreplayers" ) == 1 then return end
@@ -114,8 +117,6 @@ function NPC_Meta:SCP_CanBeSeenData()
 			local plyRelations = self:Disposition( v ) ~= D_LI
 			local plyIsBlink = v:GetNWBool( "SCP_IsBlinking" )
 
-			local scpSightAngTrig = math.cos( math.rad( SCP_SightAngle ) )
-			local scpVec = self:GetPos() + self:OBBCenter() + self:GetForward() * -30 -- Rework note: What is this magic number here for?
 			local scpVecRel = scpVec - v:GetPos() + v:OBBCenter()
 			local plyScpDotVec = v:GetForward():Dot( scpVecRel:GetNormalized() )
 			local plyVisCheck = plyScpDotVec > scpSightAngTrig
@@ -149,6 +150,7 @@ end
 
 function NPC_Meta:SCP_CanBeSeen_NPC()
 	local tb = {}
+	local scpVec = self:GetPos() + self:OBBCenter() + self:GetForward() * -30 -- Rework note: What is this magic number here for?
 
 	for _, v in ipairs( ents.FindByClass( "npc_*" ) ) do
 		if v:IsNPC() and v:Visible( self ) then
@@ -157,8 +159,6 @@ function NPC_Meta:SCP_CanBeSeen_NPC()
 			local npcRelations = self:Disposition(v) ~= D_LI
 			local npcDiffClass = v:GetClass() ~= self:GetClass()
 
-			local scpSightAngTrig = math.cos( math.rad( SCP_SightAngle ) )
-			local scpVec = self:GetPos() + self:OBBCenter() + self:GetForward() * -30 -- Rework note: What is this magic number here for?
 			local scpVecRel = scpVec - v:GetPos() + v:OBBCenter()
 			local npcScpDotVec = v:GetForward():Dot( scpVecRel:GetNormalized() )
 			local npcVisCheck = npcScpDotVec > scpSightAngTrig
@@ -227,7 +227,7 @@ concommand.Add( "cpt_scp_resetfemurbreaker", CPTBase_SCP_ResetFemurBreaker )
 
 local function CPTBase_SCP_Decontamination( ply )
 	if ply:IsAdmin() or ply:IsSuperAdmin() then
-	--	PlayGlobalSound( "cpthazama/scpsl/vo/Decont_countdown.mp3" ) -- Rework note: Sound never existed
+		-- PlayGlobalSound( "cpthazama/scpsl/vo/Decont_countdown.mp3" ) -- Rework note: Sound doesn't exist in the mod
 
 		for _, v in ipairs( ents.GetAll() ) do
 			if not IsValid( v ) then return end
@@ -249,7 +249,7 @@ concommand.Add( "cpt_scp_decontamination", CPTBase_SCP_Decontamination )
 
 local function CPTBase_SCP_Nuke( ply )
 	if ply:IsAdmin() or ply:IsSuperAdmin() then
-	--	PlayGlobalSound( "cpthazama/scpsl/vo/Main120.mp3" ) -- Rework note: Sound never existed
+		-- PlayGlobalSound( "cpthazama/scpsl/vo/Main120.mp3" ) -- Rework note: Sound doesn't exist in the mod
 
 		for _, v in ipairs( ents.GetAll() ) do
 			if not IsValid( v ) then return end

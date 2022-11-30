@@ -1,11 +1,16 @@
 local IsValid = IsValid
+local CurTime = CurTime
+local ipairs = ipairs
+local ents_FindByClass = ents.FindByClass
+local player_GetAll = player.GetAll
+local GetConVarNumber = GetConVarNumber
 
 local function CPTBase_SCP079_KillPoints( victim, inflictor, killer )
 	local canRun = false
 	local SCP = NULL
 	if not killer.CPTBase_NPC then return end
 	if killer == victim then return end
-	for _, v in ipairs( ents.FindByClass( "npc_cpt_scp_079" ) ) do
+	for _, v in ipairs( ents_FindByClass( "npc_cpt_scp_079" ) ) do
 		if v:IsNPC() then
 			canRun = true
 			SCP = v
@@ -13,7 +18,7 @@ local function CPTBase_SCP079_KillPoints( victim, inflictor, killer )
 		end
 	end
 	if canRun then
-		if table.Count( SCP.tbl_LockedDoors ) > 0 then
+		if #SCP.tbl_LockedDoors > 0 then
 			for _, v in ipairs( SCP.tbl_LockedDoors ) do
 				if victim:GetPos():Distance( v:GetPos() ) <= 450 then
 					SCP.ExperiencePoints = SCP.ExperiencePoints + 15
@@ -58,6 +63,7 @@ hook.Add( "PlayerSpawn", "CPTBase_SCP_SpawnData", function( ply )
 end )
 
 hook.Add( "PlayerDeath", "CPTBase_SCP_DeathData", function( ply )
+	timer.Remove( "SCP_1048_BleedEffect" )
 	-- if not CLIENT then return end
 	ply:SetNWBool( "SCP_HasNightvision", false )
 	ply:SetNWBool( "SCP_IsBeingDrained", false )
@@ -80,8 +86,9 @@ hook.Add( "OnEntityCreated", "CPTBase_SCP_SpawnData_NPCs", function( ent )
 end )
 
 hook.Add( "Think", "CPTBase_SCP_ZombieDeathFollow", function()
-	for _, v in ipairs( player.GetAll() ) do
-		if v:Alive() then return end
+	for i = 1, #player_GetAll() do
+		local v = player_GetAll()[i]
+		if v:Health() > 0 then return end
 		if not IsValid( v.CPTBase_SCP_Zombie ) then return end
 		-- v:SetPos(v.CPTBase_SCP_Zombie:GetPos() +v.CPTBase_SCP_Zombie:OBBCenter())
 		if not v.SCP_SpawnedZombieEntity then
@@ -91,7 +98,7 @@ hook.Add( "Think", "CPTBase_SCP_ZombieDeathFollow", function()
 			v.SCP_ZombieEntity:SetParent( v.CPTBase_SCP_Zombie )
 			v.SCP_ZombieEntity:SetRenderMode( RENDERMODE_TRANSALPHA )
 			v.SCP_ZombieEntity:Spawn()
-			v.SCP_ZombieEntity:SetColor( Color( 0, 0, 0, 0 ) )
+			v.SCP_ZombieEntity:SetColor( color_transparent )
 			v.SCP_ZombieEntity:SetNoDraw( false )
 			v.SCP_ZombieEntity:DrawShadow( false )
 			v.SCP_ZombieEntity:DeleteOnRemove( v.CPTBase_SCP_Zombie )
@@ -107,10 +114,13 @@ end )
 
 hook.Add( "Think", "CPTBase_SCP_BlinkSystem_NPCs", function()
 	local canevenblink = false
+	local scpsAll = ents_FindByClass( "npc_cpt_scp_*" )
+    local scpCur
 
-	for _, scp in ipairs( ents.FindByClass( "npc_cpt_scp_*" ) ) do
-		if scp:IsNPC() then
-			if string.find( scp:GetClass(), "173" ) or string.find( scp:GetClass(), "087_b" ) then
+	for i = 1, #scpsAll do
+		scpCur = scpsAll[i]
+		if scpCur:IsNPC() then
+			if scpCur:GetClass() == ( "npc_cpt_scp_173" or "npc_cpt_scp_087_b" ) then
 				canevenblink = true
 			end
 		end
@@ -119,10 +129,10 @@ hook.Add( "Think", "CPTBase_SCP_BlinkSystem_NPCs", function()
 	if canevenblink == false then return end
 
 	local tb = {}
-	for _, v in ipairs( ents.FindByClass( "npc_*" ) ) do
+	for _, v in ipairs( ents_FindByClass( "npc_*" ) ) do
 		if v:IsNPC() then
 			if v:Health() <= 0 then return end
-			if not ( string.find( v:GetClass(), "173" ) or string.find( v:GetClass(), "087_b" ) ) then
+			if not string.find( v:GetClass(), ( "173" or "087_b" ) ) then
 				if not tb[v] then
 					table.insert( tb, v )
 				end
@@ -130,7 +140,7 @@ hook.Add( "Think", "CPTBase_SCP_BlinkSystem_NPCs", function()
 		end
 	end
 
-	for i = 0, table.Count( tb ) do
+	for i = 1, #tb do
 		if tb[i] == nil then return end
 		if not IsValid( tb[i] ) then return end
 		if tb[i].SCP_BlinkTime == nil then tb[i].SCP_BlinkTime = CurTime() + 1 end
@@ -164,9 +174,9 @@ hook.Add( "Think", "CPTBase_SCP_BlinkSystem_NPCs", function()
 end )
 
 local function AllSCPs( ply, tb )
-	for _, v in ipairs( tb ) do
-		if not IsValid( v ) then return end
-		if v:Visible( ply ) then
+	for i = 1, #tb do
+		if not IsValid( tb[i] ) then return end
+		if tb[i]:Visible( ply ) then
 			return true
 		else
 			return false
@@ -179,12 +189,12 @@ hook.Add( "Think", "CPTBase_SCP_BlinkSystem", function()
 
 	local canevenblink = false
 	local scpsBlink = {}
-	local scpsAll = ents.FindByClass( "npc_cpt_scp_*" )
-	if table.IsEmpty( scpsAll ) then return end
+	local scpsAll = ents_FindByClass( "npc_cpt_scp_*" )
 
-	for _, scp in ipairs( scpsAll ) do
+	for i = 1, #scpsAll do
+		local scp = scpsAll[i]
 		if scp:IsNPC() then
-			if string.find( scp:GetClass(), "173" ) or string.find( scp:GetClass(), "087_b" ) then
+			if scp:GetClass() == ( "npc_cpt_scp_173" or "npc_cpt_scp_087_b" ) then
 				canevenblink = true
 				if not scpsBlink[scp] then
 					table.insert( scpsBlink, scp )
@@ -196,7 +206,8 @@ hook.Add( "Think", "CPTBase_SCP_BlinkSystem", function()
 	if canevenblink == false then return end
 
 	local tb = {}
-	for _, v in ipairs( player.GetAll() ) do
+	for i = 1, #player_GetAll() do
+		local v = player_GetAll()[i]
 		if v:IsPlayer() then
 			if not tb[v] then
 				table.insert( tb, v )
@@ -204,7 +215,7 @@ hook.Add( "Think", "CPTBase_SCP_BlinkSystem", function()
 		end
 	end
 
-	for i = 0, table.Count( tb ) do
+	for i=1, #tb do
 		if tb[i] ~= nil then
 			if tb[i] == nil then return end
 			if tb[i]:GetNWBool( "CPTBase_IsPossessing" ) then return end
