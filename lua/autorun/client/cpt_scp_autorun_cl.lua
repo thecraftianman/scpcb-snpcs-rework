@@ -1,3 +1,13 @@
+include( "autorun/client/cpt_scp_vision.lua" )
+
+local IsValid = IsValid
+local haloColor895 = Color( 255, 0, 0 )
+local haloColor079 = Color( 0, 161, 255 )
+local haloColor106 = Color( 127, 0, 0 )
+local hudWhite = color_white:Unpack()
+local hudClear = color_transparent:Unpack()
+local hudWhiteClear = 255, 255, 255, 100
+
 local tab_nightvision = {
 	["$pp_colour_addr"] = 0,
 	["$pp_colour_addg"] = 0,
@@ -22,38 +32,6 @@ local tab_plane = {
 	["$pp_colour_mulb"] = -1
 }
 
-hook.Add( "PreDrawHalos", "CPTBase_SCP_106Possession", function()
-	if not game.SinglePlayer() then return end
-	local tb = {}
-	local tb_point = {}
-	for _, v in ipairs( ents.FindByClass( "prop_physics" ) ) do
-		if v:GetNWBool( "SCP106_Point" ) then
-			table.insert( tb_point, v )
-		end
-	end
-
-	for _, ply in ipairs( player.GetAll() ) do
-		if not IsValid( ply ) then return end
-		if ply:GetNWBool( "CPTBase_IsPossessing" ) and ply:GetNWBool( "CPTBase_PossessedNPCClass" ) == "npc_cpt_scp_106" then
-			halo.Add( tb_point, Color( 127, 0, 0 ), 4, 4, 3, true, true )
-			for _, others in ipairs( ents.GetAll() ) do
-				if ( others:IsNPC() and others:GetClass() ~= "npc_cpt_scp_106" ) or ( others:IsPlayer() and others ~= v ) then
-					for _, point in ipairs( tb_point ) do
-						if others:GetPos():Distance( point:GetPos() ) <= 250 then
-							table.insert( tb, others )
-						else
-							if table.HasValue( tb, others ) then
-								tb[others] = nil
-							end
-						end
-					end
-				end
-			end
-			halo.Add( tb, Color( 127, 0, 0 ), 4, 4, 3, true, true )
-		end
-	end
-end )
-
 local CLIENT_SCP_NV = false
 concommand.Add( "cpt_scp_togglenightvision", function( ply, cmd, args )
 	CLIENT_SCP_NV = not CLIENT_SCP_NV
@@ -72,25 +50,8 @@ hook.Add( "RenderScreenspaceEffects", "CPTBase_SCP_Nightvision", function( ply )
 		DrawColorModify( tab_plane )
 	end
 end )
-	
-hook.Add( "RenderScreenspaceEffects", "CPTBase_SCP_079Possessor", function()
-	if not game.SinglePlayer() then return end
-	local tbl = {}
-	for _, ply in ipairs( player.GetAll() ) do
-		if not ply:IsValid() then return end
-		if ply:GetNWBool( "CPTBase_IsPossessing" ) and string.find( ply:GetNWBool( "CPTBase_PossessedNPCClass" ), "scp_079" ) then
-			for _, v in ipairs( ents.GetAll() ) do
-				if v:IsValid() and ( v:IsNPC() or v:IsPlayer() and v ~= ply ) then
-					table.insert(tbl,v)
-				end
-			end
-			-- if !(ply:GetNWBool("CPTBase_IsPossessing") && string.find(ply:GetNWBool("CPTBase_PossessedNPCClass"),"scp_079")) then return end
-			halo.Add( tbl, Color( 0, 161, 255 ), 15, 15, 15, true, true )
-		end
-	end
-end )
-	
-hook.Add( "Think", "CPTBase_SCP_Nightvision966", function()
+
+hook.Add( "PreDrawHalos", "CPTBase_SCP_Nightvision895", function()
 	if not CLIENT_SCP_NV then return end
 	local tbl = {}
 	local light = DynamicLight( LocalPlayer():EntIndex() )
@@ -109,11 +70,11 @@ hook.Add( "Think", "CPTBase_SCP_Nightvision966", function()
 		-- if v:IsValid() && v:IsNPC() && v:GetClass() == "npc_cpt_scp_966" then
 			-- v:SetNoDraw(false)
 		-- end
-		if v:IsValid() and v:IsNPC() then
+		if IsValid( v ) and v:IsNPC() then
 			table.insert( tbl, v )
 		end
 	end
-	halo.Add( tbl, Color( 255, 0, 0 ), 15, 15, 15, true, true )
+	halo.Add( tbl, haloColor895, 15, 15, 15, true, true )
 -- else
 	-- for _,v in ipairs(ents.GetAll()) do
 		-- if v:IsValid() && v:IsNPC() && v:GetClass() == "npc_cpt_scp_966" then
@@ -133,48 +94,51 @@ hook.Add( "HUDPaint", "CPTBase_SCP_SetBlinkTexture", function()
 	local ply = LocalPlayer()
 	if not ply then return end
 
+	local scrW = ScrW()
+	local scrH = ScrH()
+
 	if ply:GetNWBool( "SCP_IsBlinking" ) and ply:Alive() then
-		surface.SetDrawColor( 255, 255, 255, 255 )
+		surface.SetDrawColor( hudWhite )
 		surface.SetMaterial( Material( "overlay/blink" ) )
-		surface.DrawTexturedRect( 0, 0, ScrW(), ScrH() )
-		surface.SetDrawColor( 255, 255, 255, 0 )
-		surface.DrawRect( 0, 0, ScrW(), ScrH() )
+		surface.DrawTexturedRect( 0, 0, scrW, scrH )
+		surface.SetDrawColor( hudClear )
+		surface.DrawRect( 0, 0, scrW, scrH )
 	end
 
 	if ply:GetNWBool( "SCP_IsBlinking" ) then return end
 
 	if ply:Alive() and ply:GetNWBool( "SCP_895Horror" ) then
-		surface.SetDrawColor( 255, 255, 255, 255 )
+		surface.SetDrawColor( hudWhite )
 		surface.SetTexture( surface.GetTextureID( ply:GetNWString( "SCP_895HorrorID" ) ) )
-		surface.DrawTexturedRect( 0, 0, ScrW(), ScrH() )
-		surface.SetDrawColor( 255, 255, 255, 0 )
-		surface.DrawRect( 0, 0, ScrW(), ScrH() )
+		surface.DrawTexturedRect( 0, 0, scrW, scrH )
+		surface.SetDrawColor( hudClear )
+		surface.DrawRect( 0, 0, scrW, scrH )
 	end
 
 	if ply:Alive() and ply:GetNWBool( "SCP_Has178" ) then
-		surface.SetDrawColor( 255, 255, 255, 100 )
+		surface.SetDrawColor( hudWhiteClear )
 		surface.SetTexture( surface.GetTextureID( "models/cpthazama/scp/178/178_view" ) )
-		surface.DrawTexturedRect( 0, 0, ScrW(), ScrH() )
-		surface.SetDrawColor( 255, 255, 255, 0 )
-		surface.DrawRect( 0, 0, ScrW(), ScrH() )
+		surface.DrawTexturedRect( 0, 0, scrW, scrH )
+		surface.SetDrawColor( hudClear )
+		surface.DrawRect( 0, 0, scrW, scrH )
 	end
 
 	if not ply:GetNWBool( "SCP_Touched1123" ) then return end
 
 	if not ply:GetNWBool( "SCP_Touched1123_Horror" ) then
-		surface.SetDrawColor( 255, 255, 255, 255 )
+		surface.SetDrawColor( hudWhite )
 		surface.SetMaterial( Material( "engine/singlecolor" ) )
-		surface.DrawTexturedRect( 0, 0, ScrW(), ScrH() )
-		surface.SetDrawColor( 255, 255, 255, 0 )
-		surface.DrawRect( 0, 0, ScrW(), ScrH() )
+		surface.DrawTexturedRect( 0, 0, scrW, scrH )
+		surface.SetDrawColor( hudClear )
+		surface.DrawRect( 0, 0, scrW, scrH )
 	end
 
 	if ply:GetNWBool( "SCP_Touched1123_Horror" ) then
-		surface.SetDrawColor( 255, 255, 255, 255 )
+		surface.SetDrawColor( hudWhite )
 		surface.SetTexture( surface.GetTextureID( "overlay/1123" ) )
-		surface.DrawTexturedRect( 0, 0, ScrW(), ScrH() )
-		surface.SetDrawColor( 255, 255, 255, 0 )
-		surface.DrawRect( 0, 0, ScrW(), ScrH() )
+		surface.DrawTexturedRect( 0, 0, scrW, scrH )
+		surface.SetDrawColor( hudClear )
+		surface.DrawRect( 0, 0, scrW, scrH )
 	end
 end )
 
@@ -183,8 +147,8 @@ end )
 CPTBase.AddClientVar( "cpt_scp_blinkmessage", "0", true )
 
 local hookName = "CPTBaseMenu_Add_SCP"
-local menuMainTab = "CPTBase"
-local menuDropName = "Mod Settings"
+local menuMainTab = "Options"
+local menuDropName = "CPTBase"
 local menuTabName = "SCP:CB SNPCs"
 
 local function CPTBaseMenu_SCP_SNPC( panel )
@@ -249,11 +213,64 @@ local function CPTBaseMenu_SCP_SNPC( panel )
 	panel:AddControl( "Label", { Text = "Cpt. Hazama" } )
 end
 
-function CPTBaseMenu_Add_SCP()
+local function CPTBaseMenu_Add_SCP()
 	spawnmenu.AddToolMenuOption( menuMainTab, menuDropName, menuTabName, menuTabName .. " Settings", "", "", CPTBaseMenu_SCP_SNPC ) -- Tab, Dropdown, Select, Title
 end
-
 hook.Add( "PopulateToolMenu", hookName, CPTBaseMenu_Add_SCP )
+
+	-- Singleplayer Only Hooks --
+--[[ Rework note: these hooks only did anything in singleplayer already, so I just prevented them
+	from being added in the first place because that state shouldn't change mid-session.
+	I didn't really fix them like the rest of the code, though. ]]
+
+if not game.SinglePlayer() then return end
+
+hook.Add( "PreDrawHalos", "CPTBase_SCP_106Possession", function()
+	local tb = {}
+	local tb_point = {}
+	for _, v in ipairs( ents.FindByClass( "prop_physics" ) ) do
+		if v:GetNWBool( "SCP106_Point" ) then
+			table.insert( tb_point, v )
+		end
+	end
+
+	for _, ply in ipairs( player.GetAll() ) do
+		if not IsValid( ply ) then return end
+		if ply:GetNWBool( "CPTBase_IsPossessing" ) and ply:GetNWBool( "CPTBase_PossessedNPCClass" ) == "npc_cpt_scp_106" then
+			halo.Add( tb_point, haloColor106, 4, 4, 3, true, true )
+			for _, others in ipairs( ents.GetAll() ) do
+				if ( others:IsNPC() and others:GetClass() ~= "npc_cpt_scp_106" ) or ( others:IsPlayer() and others ~= v ) then
+					for _, point in ipairs( tb_point ) do
+						if others:GetPos():Distance( point:GetPos() ) <= 250 then
+							table.insert( tb, others )
+						else
+							if tb[others] then
+								tb[others] = nil
+							end
+						end
+					end
+				end
+			end
+			halo.Add( tb, haloColor106, 4, 4, 3, true, true )
+		end
+	end
+end )
+
+hook.Add( "RenderScreenspaceEffects", "CPTBase_SCP_079Possessor", function()
+	local tbl = {}
+	for _, ply in ipairs( player.GetAll() ) do
+		if not IsValid( ply ) then return end
+		if ply:GetNWBool( "CPTBase_IsPossessing" ) and string.find( ply:GetNWBool( "CPTBase_PossessedNPCClass" ), "scp_079" ) then
+			for _, v in ipairs( ents.GetAll() ) do
+				if IsValid( v ) and ( v:IsNPC() or v:IsPlayer() and v ~= ply ) then
+					table.insert( tbl, v )
+				end
+			end
+			-- if !(ply:GetNWBool("CPTBase_IsPossessing") && string.find(ply:GetNWBool("CPTBase_PossessedNPCClass"),"scp_079")) then return end
+			halo.Add( tbl, haloColor079, 15, 15, 15, true, true )
+		end
+	end
+end )
 
 	-- Unused Functions --
 

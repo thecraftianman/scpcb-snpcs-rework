@@ -1,4 +1,4 @@
-if !CPTBase then return end
+if not CPTBase then return end
 AddCSLuaFile('shared.lua')
 include('shared.lua')
 

@@ -3,7 +3,7 @@
 	Nothing in these files or/and code may be reproduced, adapted, merged or
 	modified without prior written consent of the original author, Cpt. Hazama
 --------------------------------------------------]]--
-include('server/cpt_utilities.lua')
+-- include('server/cpt_utilities.lua')
 
 CPTBASE_TBL_SCPMAPVECTORS = { -- Don't touch these
 	["gm_site19"] = {},
@@ -24,13 +24,13 @@ hook.Add("PlayerUse","CPTBase_SCP_106Containment",function(ply,ent)
 	if not util.IsSCPMap() then return end
 	if not IsValid(ent) then return end
 	if ent:GetName() == "sound_lever_106" then
-	if CurTime() <= NEXTSTT then return end
+		if CurTime() <= NEXTSTT then return end
 		if ST_FEMUR == false then
 			ST_FEMUR = true
 		else
 			ST_FEMUR = false
 		end
-		NEXTSTT = CurTime() +1
+		NEXTSTT = CurTime() + 1
 	end
 	if ent:GetName() == "magnet_lever_106" then
 		if CurTime() <= NEXTMNT then return end
@@ -97,15 +97,3 @@ function util.IsSite19()
 	end
 	return false
 end
-
---[[ hook.Add("PlayerSay","CPTBase_SCP_CommandsChat",function(ply,spoke)
-	local lowered = string.lower(spoke)
-	if ply:GetNWBool("SCP_HasNightvision") && lowered == "!removenvg" then
-		ply:SetNWBool("SCP_HasNightvision",false)
-		ply:ChatPrint("You take off the nightvision goggles.")
-	end
-	if ply:GetNWBool("SCP_Has178") && lowered == "!remove178" then
-		ply:SetNWBool("SCP_Has178",false)
-		ply:ChatPrint("You take off the 3D glasses.")
-	end
-end) ]]--

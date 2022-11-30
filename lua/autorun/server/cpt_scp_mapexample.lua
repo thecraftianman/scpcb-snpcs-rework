@@ -3,14 +3,14 @@
 	Nothing in these files or/and code may be reproduced, adapted, merged or
 	modified without prior written consent of the original author, Cpt. Hazama
 --------------------------------------------------]]--
-include('server/cpt_utilities.lua')
-include('cpt_scp_map.lua')
+include('autorun/server/cpt_scp_map.lua')
 
 --[[
 	This will show mappers how to add their own Vectors for my SNPCs
 	To retrieve coordinates, run this in your console in singleplayer: lua_run for _,v in pairs(player.GetAll()) do print("Vector("..v:GetPos().x..","..v:GetPos().y..","..v:GetPos().z..")") end
 
-	To ensure everything works properly, make sure that you put the vectors in the same order as those listed below. I was having trouble allowing you to give the vectors nick names so for now you'll just have to put them in the same order as those listed.
+	To ensure everything works properly, make sure that you put the vectors in the same order as those listed below.
+	I was having trouble allowing you to give the vectors nicknames so for now you'll just have to put them in the same order as those listed.
 
 	Vectors in order:
 	POCKETDIMENSION
@@ -26,7 +26,7 @@ include('cpt_scp_map.lua')
 	VENTG
 	VENTH
 	
-	You do not have to put the vents or the statue vectors. Infact the only vector you really need imo is the pocket dimension. However I recommend you add the PD and femur breaker stuff at least
+	You do not have to put the vents or the statue vectors. In fact the only vector you really need imo is the pocket dimension. However I recommend you add the PD and femur breaker stuff at least
 ]]--
 
 POCKETDIMENSION = 1

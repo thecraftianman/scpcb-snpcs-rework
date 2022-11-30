@@ -3,10 +3,6 @@
 	Nothing in these files or/and code may be reproduced, adapted, merged or
 	modified without prior written consent of the original author, Cpt. Hazama
 --------------------------------------------------]]--
-include( "server/cpt_utilities.lua" )
-include( "client/cpt_scp_vision.lua" )
-include( "cpt_scp_map.lua" )
-
 -- if !CPTBase.IsAddonUpdated("cptbase","54") then return end
 
 CPTBase.RegisterMod( "SCP:CB SNPCs", "0.2.1" )
@@ -89,21 +85,9 @@ CPTBase.AddNPC( "Scientist", "npc_cpt_scp_scientist", category ) -- STAHP! NO!
 
 CPTBase.AddNPC( "Nightvision Goggles", "ent_cpt_scp_nightvision", category ) -- The object itself isn't a NPC but technically speaking, it is a NPC since well, it's running on my SNPC base
 
-hook.Add( "PlayerUse", "CPTBase_SCP005", function( ply, ent )
-	if not ply.SCP_Has005 then return end
-	if ply.SCP_NextUnlockDoorT == nil then ply.SCP_NextUnlockDoorT = 0 end
-	if not ent:IsValid() then return end
-	if CurTime() > ply.SCP_NextUnlockDoorT and string.find( ent:GetClass(), "door" ) and string.find( ent:GetSequenceName( ent:GetSequence() ), "locked" ) then
-		ent:Fire( "Unlock" )
-		ply:ChatPrint( "Door unlocked with SCP-005" )
-		ply:ChatPrint( "SCP-005 cooldown time is 3 seconds" )
-		ent:EmitSound( "doors/default_locked.wav", 70, 100 )
-		ply.SCP_NextUnlockDoorT = CurTime() + 3
-	end
-end )
-
 	-- Custom Functions --
 
+local IsValid = IsValid
 local NPC_Meta = FindMetaTable( "NPC" )
 local SCP_SightAngle = 50
 SCP_GlobalNTFCoolDown = 0
@@ -137,11 +121,11 @@ function NPC_Meta:SCP_CanBeSeenData()
 			local plyVisCheck = plyScpDotVec > scpSightAngTrig
 
 			if v:Alive() and plyRelations and v:Visible( self ) and plyVisCheck and plyIsBlink == false and v.IsPossessing == false then
-				if not table.HasValue( tb ) then
+				if not tb[v] then
 					table.insert( tb, v )
 				end
 			else
-				if table.HasValue( tb ) and tb[v] ~= nil then
+				if tb[v] and tb[v] ~= nil then
 					tb[v] = nil
 				end
 			end
@@ -152,7 +136,7 @@ function NPC_Meta:SCP_CanBeSeenData()
 end
 
 function NPC_Meta:SCP_CanBeSeen()
-	local tb = self:SCP_CanBeSeenData()
+	local tb = self:SCP_CanBeSeenData() -- Rework note: This function originally just repeated the code of SCP_CanBeSeenData()
 
 	for _, v in ipairs( tb ) do
 		if v == nil then
@@ -180,11 +164,11 @@ function NPC_Meta:SCP_CanBeSeen_NPC()
 			local npcVisCheck = npcScpDotVec > scpSightAngTrig
 
 			if npcDiffEnt and not v.SCP_IsBlinking and npcNotBullseye and npcRelations and npcDiffClass and v:Visible( self ) and npcVisCheck then
-				if not table.HasValue( tb ) then
+				if not tb[v] then
 					table.insert( tb, v )
 				end
 			else
-				if table.HasValue( tb ) and tb[v] ~= nil then
+				if tb[v] and tb[v] ~= nil then
 					tb[v] = nil
 				end
 			end
@@ -227,7 +211,7 @@ CPTBase.AddConVar( "cpt_scp_682audio", "0" )
 CPTBase.AddConVar( "cpt_scp_682theme", "0" )
 CPTBase.AddConVar( "cpt_scp_guardduty", "0" )
 
-local function CPTBase_SCP_ResetFemurBreaker(ply)
+local function CPTBase_SCP_ResetFemurBreaker( ply )
 	if ply:IsAdmin() or ply:IsSuperAdmin() then
 		if SERVER then
 			FEMURACTIVATED = false
@@ -239,34 +223,48 @@ local function CPTBase_SCP_ResetFemurBreaker(ply)
 		end
 	end
 end
-concommand.Add("cpt_scp_resetfemurbreaker",CPTBase_SCP_ResetFemurBreaker)
+concommand.Add( "cpt_scp_resetfemurbreaker", CPTBase_SCP_ResetFemurBreaker )
 
-local function CPTBase_SCP_Decontamination(ply)
+local function CPTBase_SCP_Decontamination( ply )
 	if ply:IsAdmin() or ply:IsSuperAdmin() then
-		PlayGlobalSound("cpthazama/scpsl/vo/Decont_countdown.mp3")
-		for _,v in ipairs(ents.GetAll()) do
-			if v:IsValid() and v:GetClass() == "prop_door_rotating" or v:GetClass() == "func_door" then
-				v:Fire("Unlock")
-				v:Fire("Open")
+	--	PlayGlobalSound( "cpthazama/scpsl/vo/Decont_countdown.mp3" ) -- Rework note: Sound never existed
+
+		for _, v in ipairs( ents.GetAll() ) do
+			if not IsValid( v ) then return end
+			if v:GetClass() == "prop_door_rotating" or v:GetClass() == "func_door" then
+				v:Fire( "Unlock" )
+				v:Fire( "Open" )
 				-- v:Fire("Lock")
 			end
 		end
-		timer.Simple(38,function() for _,v in ipairs(player.GetAll()) do v:Kill() end end)
+
+		timer.Simple( 38, function()
+			for _, v in ipairs( player.GetAll() ) do
+				v:Kill()
+			end
+		end )
 	end
 end
-concommand.Add("cpt_scp_decontamination",CPTBase_SCP_Decontamination)
+concommand.Add( "cpt_scp_decontamination", CPTBase_SCP_Decontamination )
 
-local function CPTBase_SCP_Nuke(ply)
+local function CPTBase_SCP_Nuke( ply )
 	if ply:IsAdmin() or ply:IsSuperAdmin() then
-		PlayGlobalSound("cpthazama/scpsl/vo/Main120.mp3")
-		for _,v in ipairs(ents.GetAll()) do
-			if v:IsValid() and v:GetClass() == "prop_door_rotating" or v:GetClass() == "func_door" then
-				v:Fire("Unlock")
-				v:Fire("Open")
+	--	PlayGlobalSound( "cpthazama/scpsl/vo/Main120.mp3" ) -- Rework note: Sound never existed
+
+		for _, v in ipairs( ents.GetAll() ) do
+			if not IsValid( v ) then return end
+			if v:GetClass() == "prop_door_rotating" or v:GetClass() == "func_door" then
+				v:Fire( "Unlock" )
+				v:Fire( "Open" )
 				-- v:Fire("Lock")
 			end
 		end
-		timer.Simple(131,function() for _,v in ipairs(ents.GetAll()) do v:TakeDamage(999999999,nil) end end)
+
+		timer.Simple( 131, function()
+			for _, v in ipairs( ents.GetAll() ) do
+				v:TakeDamage( 999999999, nil )
+			end
+		end )
 	end
 end
-concommand.Add("cpt_scp_nuke",CPTBase_SCP_Nuke)
+concommand.Add( "cpt_scp_nuke", CPTBase_SCP_Nuke )

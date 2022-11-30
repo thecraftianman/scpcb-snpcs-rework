@@ -102,7 +102,7 @@ function ENT:OnHitEntity(hitents,hitpos)
 			v:SetDSP(32,false)
 			v:Freeze(true)
 			timer.Simple(0.6,function() if IsValid(v) then v:Freeze(false) end end)
-			ParticleEffect("blood_impact_red_01",v:GetAttachment(v:LookupAttachment("eyes")).Pos,Angle(math.random(0,360),math.random(0,360),math.random(0,360)),false)
+			ParticleEffect("blood_impact_red_01",v:GetAttachment(v:LookupAttachment("eyes")).Pos,Angle(math.random(0,360),math.random(0,360),math.random(0,360)),v)
 		end
 	end
 	self:EmitSound(self:SelectFromTable(self.tbl_Sounds["Strike"]),90,100)
