@@ -72,6 +72,30 @@ function ENT:HandleEvents(...)
 	end
 end
 ---------------------------------------------------------------------------------------------------------------------------------------------
+local function zombieDeathFollow( ply )
+	if not SERVER then return end
+	if ply:Health() > 0 then return end
+	if not IsValid( ply.CPTBase_SCP_Zombie ) then return end
+	if not ply.SCP_SpawnedZombieEntity then
+		ply.SCP_ZombieEntity = ents.Create( "prop_dynamic" )
+		ply.SCP_ZombieEntity:SetPos( ply.CPTBase_SCP_Zombie:GetPos() + ply.CPTBase_SCP_Zombie:OBBCenter() )
+		ply.SCP_ZombieEntity:SetModel( "models/props_junk/watermelon01_chunk02c.mdl" )
+		ply.SCP_ZombieEntity:SetParent( ply.CPTBase_SCP_Zombie )
+		ply.SCP_ZombieEntity:SetRenderMode( RENDERMODE_TRANSALPHA )
+		ply.SCP_ZombieEntity:Spawn()
+		ply.SCP_ZombieEntity:SetColor( color_transparent )
+		ply.SCP_ZombieEntity:SetNoDraw( false )
+		ply.SCP_ZombieEntity:DrawShadow( false )
+		ply.SCP_ZombieEntity:DeleteOnRemove( ply.CPTBase_SCP_Zombie )
+		ply.SCP_SpawnedZombieEntity = true
+	end
+	if IsValid( ply.SCP_ZombieEntity ) then
+		ply:Spectate( OBS_MODE_CHASE )
+		ply:SpectateEntity( ply.SCP_ZombieEntity )
+		ply:SetMoveType( MOVETYPE_OBSERVER )
+	end
+end
+---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnHitEntity(hitents,hitpos)
 	if self.tbl_Sounds["Strike"] == nil then
 		self:EmitSound("npc/zombie/claw_strike" .. math.random(1,3) .. ".wav",55,100)
@@ -82,7 +106,7 @@ function ENT:OnHitEntity(hitents,hitpos)
 		if v:IsValid() && v:IsPlayer() && v:Alive() && v.SCP_Has714 == false && v.SCP_Infected_049 == false then
 			if v.CPTBase_SCP_InfectionOverlayT == nil then v.CPTBase_SCP_InfectionOverlayT = 0 end
 			v.SCP_Infected_049 = true
-			v:ChatPrint("You instantly feel weaker and want to throw up..")
+			v:ChatPrint("You instantly feel weaker and want to throw up...")
 			v:EmitSound("cpthazama/scp/D9341/Heartbeat.mp3",70,100)
 			v:SendLua("surface.PlaySound('cpthazama/scp/music/Horror8.mp3')")
 			v:ConCommand("r_screenoverlay models/props_lab/Tank_Glass001.vmt")
@@ -93,12 +117,12 @@ function ENT:OnHitEntity(hitents,hitpos)
 				end
 			end)
 			local deaths = v:Deaths()
-			local time = GetConVarNumber("cpt_scp_049infectiontime")
+			local time = GetConVar("cpt_scp_049infectiontime"):GetInt()
 			timer.Simple(time /3,function()
 				if v:IsValid() && v.SCP_Infected_049 then
 					if v:Deaths() > deaths then return end
 					v:EmitSound("cpthazama/scp/D9341/Damage6.mp3",70,100)
-					v:ChatPrint("Parts of your skin begins to peel off and your bones start to crack..")
+					v:ChatPrint("Parts of your skin begin to peel off and your bones start to crack...")
 					v:TakeDamage(5,v)
 				end
 			end)
@@ -107,15 +131,16 @@ function ENT:OnHitEntity(hitents,hitpos)
 					if v:Deaths() > deaths then return end
 					v:EmitSound("cpthazama/scp/D9341/Cough3.mp3",70,100)
 					v:SendLua("surface.PlaySound('cpthazama/scp/music/Room049.mp3')")
-					v:ChatPrint("Blood begins to pour from your mouth and ears..")
+					v:ChatPrint("Blood begins to pour from your mouth and ears...")
 					for i = 1,3 do
-						ParticleEffect("blood_impact_red_01",v:GetAttachment(2).Pos,Angle(math.random(0,360),math.random(0,360),math.random(0,360)),false)
+						ParticleEffect("blood_impact_red_01",v:GetAttachment(2).Pos,Angle(math.random(0,360),math.random(0,360),math.random(0,360)),v)
 					end
 				end
 			end)
 			timer.Simple(time,function()
 				if v:IsValid() && v.SCP_Infected_049 then
 					if v:Deaths() > deaths then return end
+					v:ChatPrint("You lose consciousness and your body is turned into a walking corpse...")
 					local zombie = ents.Create("npc_cpt_scp_049_2")
 					zombie:SetPos(v:GetPos())
 					zombie:SetAngles(v:GetAngles())
@@ -127,6 +152,8 @@ function ENT:OnHitEntity(hitents,hitpos)
 					v:Kill()
 					v.CPTBase_SCP_Zombie = zombie
 					v:GetRagdollEntity():Remove()
+					zombie:PlaySequence("resurrect",1)
+					if SERVER then zombieDeathFollow( v ) end
 				end
 			end)
 		end

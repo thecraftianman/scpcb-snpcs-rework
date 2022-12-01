@@ -201,6 +201,30 @@ function ENT:WhenRemoved()
 	self.ChaseSong:Stop()
 end
 ---------------------------------------------------------------------------------------------------------------------------------------------
+local function zombieDeathFollow( ply )
+	if not SERVER then return end
+	if ply:Health() > 0 then return end
+	if not IsValid( ply.CPTBase_SCP_Zombie ) then return end
+	if not ply.SCP_SpawnedZombieEntity then
+		ply.SCP_ZombieEntity = ents.Create( "prop_dynamic" )
+		ply.SCP_ZombieEntity:SetPos( ply.CPTBase_SCP_Zombie:GetPos() + ply.CPTBase_SCP_Zombie:OBBCenter() )
+		ply.SCP_ZombieEntity:SetModel( "models/props_junk/watermelon01_chunk02c.mdl" )
+		ply.SCP_ZombieEntity:SetParent( ply.CPTBase_SCP_Zombie )
+		ply.SCP_ZombieEntity:SetRenderMode( RENDERMODE_TRANSALPHA )
+		ply.SCP_ZombieEntity:Spawn()
+		ply.SCP_ZombieEntity:SetColor( color_transparent )
+		ply.SCP_ZombieEntity:SetNoDraw( false )
+		ply.SCP_ZombieEntity:DrawShadow( false )
+		ply.SCP_ZombieEntity:DeleteOnRemove( ply.CPTBase_SCP_Zombie )
+		ply.SCP_SpawnedZombieEntity = true
+	end
+	if IsValid( ply.SCP_ZombieEntity ) then
+		ply:Spectate( OBS_MODE_CHASE )
+		ply:SpectateEntity( ply.SCP_ZombieEntity )
+		ply:SetMoveType( MOVETYPE_OBSERVER )
+	end
+end
+---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnKilledEnemy(v)
 	local function SCPSounds()
 		timer.Simple(0.4,function()
@@ -276,7 +300,7 @@ function ENT:OnKilledEnemy(v)
 		self:PlaySequence("infect",1)
 		v:Remove()
 	elseif v:IsPlayer() && v.SCP_Has714 == false then
-		v:ChatPrint("You lose consciousness and your body is turned into a walking corpse..")
+		v:ChatPrint("You lose consciousness and your body is turned into a walking corpse...")
 		local zombie = ents.Create("npc_cpt_scp_049_2")
 		zombie:SetPos(v:GetPos())
 		zombie:SetAngles(v:GetAngles())
@@ -291,6 +315,7 @@ function ENT:OnKilledEnemy(v)
 		v:GetRagdollEntity():Remove()
 		zombie:PlaySequence("resurrect",1)
 		SCPSounds()
+		if SERVER then zombieDeathFollow( v ) end
 	end
 	self.TotalInfections = self.TotalInfections +1
 end

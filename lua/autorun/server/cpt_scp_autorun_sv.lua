@@ -3,7 +3,7 @@ local CurTime = CurTime
 local ipairs = ipairs
 local ents_FindByClass = ents.FindByClass
 local player_GetAll = player.GetAll
-local GetConVarNumber = GetConVarNumber
+local GetConVar = GetConVar
 
 local function CPTBase_SCP079_KillPoints( victim, inflictor, killer )
 	local canRun = false
@@ -85,37 +85,10 @@ hook.Add( "OnEntityCreated", "CPTBase_SCP_SpawnData_NPCs", function( ent )
 	ent.SCP_BlinkTime = CurTime() + math.random( 4, 7 )
 end )
 
-hook.Add( "Think", "CPTBase_SCP_ZombieDeathFollow", function()
-	for i = 1, #player_GetAll() do
-		local v = player_GetAll()[i]
-		if v:Health() > 0 then return end
-		if not IsValid( v.CPTBase_SCP_Zombie ) then return end
-		-- v:SetPos(v.CPTBase_SCP_Zombie:GetPos() +v.CPTBase_SCP_Zombie:OBBCenter())
-		if not v.SCP_SpawnedZombieEntity then
-			v.SCP_ZombieEntity = ents.Create( "prop_dynamic" )
-			v.SCP_ZombieEntity:SetPos( v.CPTBase_SCP_Zombie:GetPos() + v.CPTBase_SCP_Zombie:OBBCenter() )
-			v.SCP_ZombieEntity:SetModel( "models/props_junk/watermelon01_chunk02c.mdl" )
-			v.SCP_ZombieEntity:SetParent( v.CPTBase_SCP_Zombie )
-			v.SCP_ZombieEntity:SetRenderMode( RENDERMODE_TRANSALPHA )
-			v.SCP_ZombieEntity:Spawn()
-			v.SCP_ZombieEntity:SetColor( color_transparent )
-			v.SCP_ZombieEntity:SetNoDraw( false )
-			v.SCP_ZombieEntity:DrawShadow( false )
-			v.SCP_ZombieEntity:DeleteOnRemove( v.CPTBase_SCP_Zombie )
-			v.SCP_SpawnedZombieEntity = true
-		end
-		if IsValid( v.SCP_ZombieEntity ) then
-			v:Spectate( OBS_MODE_CHASE )
-			v:SpectateEntity( v.SCP_ZombieEntity )
-			v:SetMoveType( MOVETYPE_OBSERVER )
-		end
-	end
-end )
-
 hook.Add( "Think", "CPTBase_SCP_BlinkSystem_NPCs", function()
 	local canevenblink = false
 	local scpsAll = ents_FindByClass( "npc_cpt_scp_*" )
-    local scpCur
+	local scpCur
 
 	for i = 1, #scpsAll do
 		scpCur = scpsAll[i]
@@ -164,7 +137,7 @@ hook.Add( "Think", "CPTBase_SCP_BlinkSystem_NPCs", function()
 				if not tb[i].SCP_IsBlinking then return end
 				tb[i].SCP_IsBlinking = false
 				local time = math.random( 5, 9 )
-				if GetConVarNumber( "cpt_scp_173blinksame" ) == 1 then
+				if GetConVar( "cpt_scp_173blinksame" ):GetInt() == 1 then
 					time = 5
 				end
 				tb[i].SCP_BlinkTime = CurTime() + time
@@ -185,7 +158,7 @@ local function AllSCPs( ply, tb )
 end
 
 hook.Add( "Think", "CPTBase_SCP_BlinkSystem", function()
-	if GetConVarNumber( "ai_ignoreplayers" ) == 1 then return end
+	if GetConVar( "ai_ignoreplayers" ):GetInt() == 1 then return end
 
 	local canevenblink = false
 	local scpsBlink = {}
@@ -236,10 +209,10 @@ hook.Add( "Think", "CPTBase_SCP_BlinkSystem", function()
 				if not tb[i]:Alive() then return end
 				tb[i]:SetNWBool( "SCP_IsBlinking", false )
 				local time = math.random( 5, 9 )
-				if GetConVarNumber( "cpt_scp_173blinksame" ) == 1 then
+				if GetConVar( "cpt_scp_173blinksame" ):GetInt() == 1 then
 					time = 5
 				end
-				if GetConVarNumber( "cpt_scp_blinkmessage" ) == 1 then
+				if GetConVar( "cpt_scp_blinkmessage" ):GetInt() == 1 then
 					tb[i]:ChatPrint( "You will blink in " .. time .. " seconds." )
 				end
 				tb[i]:SetNWInt( "SCP_BlinkTime", CurTime() + time )
