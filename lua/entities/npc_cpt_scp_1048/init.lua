@@ -53,31 +53,17 @@ function ENT:HandleEvents(...)
 	end
 end
 ---------------------------------------------------------------------------------------------------------------------------------------------
---[[hook.Add("Think","CPTBase_SCP_1048a_Think",function()
-	for _,v in ipairs(player.GetAll()) do
-		if not IsValid(v) then return end
-      	if v:Health() <= 0 then return end
-      	if v.SCP_Inflicted_1048a then
-			for i = 0,v:GetBoneCount() -1 do
-				if math.random(1,250) == 1 && v:GetBonePosition(i) ~= v:GetPos() then
-					ParticleEffect("blood_impact_red_01",v:GetBonePosition(i),Angle(0,0,0),v)
-				end
-			end
-        end
-	end
-end)]]
----------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnHitEntity(hitents,hitpos)
 	local hitPlys = {}
 	for _,v in ipairs(hitents) do
 		if not IsValid(v) then return end
-    	if not v:IsPlayer() then return end
-    	if v:Health() <= 0 then return end
-    	if v.SCP_Has714 ~= false then return end
+		if not v:IsPlayer() then return end
+		if v:Health() <= 0 then return end
+		if v.SCP_Has714 ~= false then return end
 		if not hitPlys[v] then table.insert(hitPlys, v) end
 		if v.SCP_Inflicted_1048a == false then
 			v.SCP_Inflicted_1048a = true
-      		--table.insert(hitPlys, v)
+			--table.insert(hitPlys, v)
 			v:ChatPrint("Your body begins to melt and your trachea becomes filled with human ears...")
 			v:EmitSound("cpthazama/scp/1048a/growth.mp3",75,100)
 			local deaths = v:Deaths()
@@ -167,7 +153,7 @@ function ENT:DoAttack()
 		timer.Simple(attack_time,function()
 			if self:IsValid() then
 				for _,v in ipairs(ents.FindInSphere(self:GetPos(),self.MeleeAttackDamageDistance)) do
-					if v:IsValid() && ((v:IsPlayer() && v:Alive() && GetConVarNumber("ai_ignoreplayers") == 0 && v.IsPossessing == false) || (v:IsNPC() && v != self && v.Faction != self.Faction && v:Disposition(self) != D_LI)) then
+					if v:IsValid() && ((v:IsPlayer() && v:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0 && v.IsPossessing == false) || (v:IsNPC() && v != self && v.Faction != self.Faction && v:Disposition(self) != D_LI)) then
 						v:TakeDamage(8,self)
 						table.insert(hitents,v)
 					end

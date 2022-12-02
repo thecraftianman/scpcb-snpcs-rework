@@ -60,7 +60,7 @@ end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnInputAccepted(event,activator)
 	if CurTime() > self.NextUseT then
-		if event == "Use" && IsValid(activator) && activator:IsPlayer() && activator:Alive() && GetConVarNumber("ai_ignoreplayers") == 0 && activator.SCP_Has427 == false && self.IsPickedUp == false then
+		if event == "Use" && IsValid(activator) && activator:IsPlayer() && activator:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0 && activator.SCP_Has427 == false && self.IsPickedUp == false then
 			activator:ChatPrint("The locket fits perfectly around your neck..")
 			activator.SCP_Has427 = true
 			self:SetNoDraw(true)

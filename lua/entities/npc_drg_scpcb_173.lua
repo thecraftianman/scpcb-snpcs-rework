@@ -127,7 +127,7 @@ if SERVER then
   -- These hooks are called while the nextbot is patrolling (inside the coroutine)
   function ENT:OnReachedPatrol( pos )
     self:Wait( math.random( 3, 7 ) )
-  end 
+  end
   function ENT:OnPatrolUnreachable( pos ) end
   function ENT:OnPatrolling( pos ) end
 
@@ -147,7 +147,7 @@ if SERVER then
     self:SpotEntity( dmg:GetAttacker() )
   end
   function ENT:OnFatalDamage( dmg, hitgroup ) end
-  
+
   -- Called inside the coroutine
   function ENT:OnTookDamage( dmg, hitgroup ) end
   function ENT:OnDeath( dmg, hitgroup ) end

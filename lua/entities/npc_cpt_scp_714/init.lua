@@ -26,7 +26,7 @@ end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnInputAccepted(event,activator)
 	if CurTime() > self.NextUseT then
-		if event == "Use" && activator:IsPlayer() && activator:Alive() && GetConVarNumber("ai_ignoreplayers") == 0 && activator.SCP_Has714 == false then
+		if event == "Use" && activator:IsPlayer() && activator:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0 && activator.SCP_Has714 == false then
 			activator:ChatPrint("You pick up SCP-714 and it fits perfectly. Although you feel a bit tired..")
 			activator.SCP_Has714 = true
 			activator.SCP_Infected_008 = false

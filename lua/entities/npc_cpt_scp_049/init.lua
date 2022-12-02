@@ -69,7 +69,7 @@ function ENT:SetInit()
 	self.NextThemeSongT = 0
 	self.NextChaseSongT = 0
 	self.NextDoorT = 0
-	if GetConVarNumber("cpt_scp_049slsounds") == 1 then
+	if GetConVar("cpt_scp_049slsounds"):GetInt() == 1 then
 		self.tbl_Sounds["FootStep"] = {"cpthazama/scp/049/SCPSL_Footstep01.mp3","cpthazama/scp/049/SCPSL_Footstep02.mp3"}
 	else
 		self.tbl_Sounds["FootStep"] = {"cpthazama/scp/049/Step1.mp3","cpthazama/scp/049/Step2.mp3","cpthazama/scp/049/Step3.mp3"}
@@ -169,7 +169,7 @@ function ENT:OnThink()
 			self.NextDoorT = CurTime() +math.Rand(1,3)
 		end
 	end
-	if GetConVarNumber("cpt_scp_usemusic") == 1 then
+	if GetConVar("cpt_scp_usemusic"):GetInt() == 1 then
 		if !IsValid(self:GetEnemy()) then
 			self.ChaseSong:Stop()
 			self.NextChaseSongT = CurTime()

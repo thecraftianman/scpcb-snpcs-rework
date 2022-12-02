@@ -55,7 +55,7 @@ function ENT:SetInit()
 	self.IsAttacking = false
 	self.NextAlarmT = 0
 	self.NextDoorT = 0
-	if GetConVarNumber("cpt_scp_682audio") == 1 then
+	if GetConVar("cpt_scp_682audio"):GetInt() == 1 then
 		for _,v in ipairs(player.GetAll()) do
 			v:SendLua("surface.PlaySound('cpthazama/scp/682/anoucement.mp3')")
 		end
@@ -144,7 +144,7 @@ function ENT:OnThink_Disabled()
 		end
 		self.NextHealT = CurTime() +0.1
 	end
-	if GetConVarNumber("cpt_scp_682audio") == 1 && CurTime() > self.NextAlarmT then
+	if GetConVar("cpt_scp_682audio"):GetInt() == 1 && CurTime() > self.NextAlarmT then
 		for _,v in ipairs(player.GetAll()) do
 			v:SendLua("surface.PlaySound('cpthazama/scp/682/Alarm verb.mp3')")
 		end

@@ -152,7 +152,7 @@ function ENT:OnEnemyChanged(ent)
 end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnKilledEnemy(v)
-	if GetConVarNumber("cpt_scp_ntfannouncer") == 1 && util.IsSCPMap() then
+	if GetConVar("cpt_scp_ntfannouncer"):GetInt() == 1 && util.IsSCPMap() then
 		if v:IsNPC() then
 			if v:GetClass() == "npc_cpt_scp_173" then
 				for _,v in ipairs(player.GetAll()) do
@@ -436,7 +436,7 @@ end
 function ENT:HandleSchedules(enemy,dist,nearest,disp,time)
 	if self.IsPossessed then return end
 	if(disp == D_HT) then
-		if GetConVarNumber("cpt_scp_mtfhiding") == 1 then
+		if GetConVar("cpt_scp_mtfhiding"):GetInt() == 1 then
 			if enemy:GetClass() == "npc_cpt_scp_096" && !enemy.IsTriggered then self:Hide("Walk") return end
 			if enemy:GetClass() == "npc_cpt_scp_106" then self:Hide("Run") return end
 			if enemy:GetClass() == "npc_cpt_scp_049" then self:Hide("Run") return end

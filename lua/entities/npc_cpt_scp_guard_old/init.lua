@@ -344,7 +344,7 @@ function ENT:OnThink()
 	else
 		if !self.IsPossessed then
 			self:SetIdleAnimation(ACT_IDLE)
-			if GetConVarNumber("cpt_scp_guardduty") == 1 && !self.IsBossing && CurTime() > self.FindBossedT then
+			if GetConVar("cpt_scp_guardduty"):GetInt() == 1 && !self.IsBossing && CurTime() > self.FindBossedT then
 				local v = self:FindPlayer()
 				if IsValid(v) then
 					self.Bossed = v
@@ -455,7 +455,7 @@ end
 function ENT:HandleSchedules(enemy,dist,nearest,disp,time)
 	if self.IsPossessed then return end
 	if(disp == D_HT) then
-		if GetConVarNumber("cpt_scp_mtfhiding") == 1 then
+		if GetConVar("cpt_scp_mtfhiding"):GetInt() == 1 then
 			if enemy:GetClass() == "npc_cpt_scp_096" && !enemy.IsTriggered then self:Hide("Walk") return end
 			if enemy:GetClass() == "npc_cpt_scp_106" then self:Hide("Run") return end
 			if enemy:GetClass() == "npc_cpt_scp_049" then self:Hide("Run") return end

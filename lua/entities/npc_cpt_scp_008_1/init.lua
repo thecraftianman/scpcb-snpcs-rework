@@ -86,7 +86,7 @@ function ENT:OnHitEntity(hitents,hitpos)
 			v:EmitSound("cpthazama/scp/008/Voices0.mp3",50,100)
 			v:ChatPrint("You feel like something is wrong..")
 			local deaths = v:Deaths()
-			local time = GetConVarNumber("cpt_scp_008infectiontime")
+			local time = GetConVar("cpt_scp_008infectiontime"):GetInt()
 			timer.Simple(time /3,function()
 				if v:IsValid() && v.SCP_Infected_008 then
 					if v:Deaths() > deaths then return end

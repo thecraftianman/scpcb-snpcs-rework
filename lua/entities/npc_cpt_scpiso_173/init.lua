@@ -5,7 +5,7 @@ include('shared.lua')
 ENT.ModelTable = {"models/cpthazama/scpiso/173.mdl"}
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnSeen()
-	if GetConVarNumber("ai_ignoreplayers") == 1 then return end
+	if GetConVar("ai_ignoreplayers"):GetInt() == 1 then return end
 	if self.IsContained then return end
 	if CurTime() > self.NextAlertSoundShitT then
 		-- self:PlaySound("Horror",100)

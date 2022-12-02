@@ -26,7 +26,7 @@ end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnInputAccepted(event,activator)
 	if CurTime() > self.NextUseT then
-		if event == "Use" && IsValid(activator) && activator:IsPlayer() && activator:Alive() && GetConVarNumber("ai_ignoreplayers") == 0 then
+		if event == "Use" && IsValid(activator) && activator:IsPlayer() && activator:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0 then
 			activator:SetHealth(activator:Health() +80)
 			activator:ChatPrint("Your wounds heal instantly..")
 			self:Remove()

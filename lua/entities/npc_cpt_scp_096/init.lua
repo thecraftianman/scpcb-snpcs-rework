@@ -227,7 +227,7 @@ end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnTakePain(dmg,dmginfo,hitbox)
 	if CurTime() <= self.NextCanTriggerT then return end
-	if IsValid(dmg:GetInflictor()) && dmg:GetInflictor():IsPlayer() && GetConVarNumber("ai_ignoreplayers") then return end
+	if IsValid(dmg:GetInflictor()) && dmg:GetInflictor():IsPlayer() && GetConVar("ai_ignoreplayers"):GetInt() then return end
 	if self.IsTriggered == false then
 		self.IsTriggered = true
 		self.TriggeredEntity = dmg:GetInflictor()
@@ -243,7 +243,7 @@ function ENT:FindFaceLookers()
 		if v:IsValid() then
 			if v:IsPlayer() then
 				local dist = self:FindDistanceToPos(facepos,v:GetEyeTrace().HitPos)
-				if self.IsTriggered == false && dist <= 55 && GetConVarNumber("ai_ignoreplayers") == 0 && self:Disposition(v) != D_LI && v:Visible(self) && (self:GetForward():Dot(((v:GetPos() +v:OBBCenter()) -self:GetPos() +self:OBBCenter()):GetNormalized()) > math.cos(math.rad(SCP_SightAngle +20))) then
+				if self.IsTriggered == false && dist <= 55 && GetConVar("ai_ignoreplayers"):GetInt() == 0 && self:Disposition(v) != D_LI && v:Visible(self) && (self:GetForward():Dot(((v:GetPos() +v:OBBCenter()) -self:GetPos() +self:OBBCenter()):GetNormalized()) > math.cos(math.rad(SCP_SightAngle +20))) then
 					self.IsTriggered = true
 					self.TriggeredEntity = v
 					self:OnTriggered(v,30)

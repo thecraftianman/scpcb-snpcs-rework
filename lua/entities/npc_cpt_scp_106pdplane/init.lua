@@ -33,7 +33,7 @@ function ENT:SetInit()
 end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:CanBeSeenByPlane(v)
-	if (v:IsNPC() && v != self || (v:IsPlayer() && GetConVarNumber("ai_ignoreplayers") == 0)) && self:Disposition(v) != D_LI && self:Visible(v) && (v.Faction != self.Faction && v.Faction != "FACTION_NONE") then
+	if (v:IsNPC() && v != self || (v:IsPlayer() && GetConVar("ai_ignoreplayers"):GetInt() == 0)) && self:Disposition(v) != D_LI && self:Visible(v) && (v.Faction != self.Faction && v.Faction != "FACTION_NONE") then
 		return true
 	end
 	return false

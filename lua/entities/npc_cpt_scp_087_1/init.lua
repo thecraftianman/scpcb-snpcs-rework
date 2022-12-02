@@ -135,7 +135,7 @@ function ENT:OnHitEntity(hitents,hitpos)
 end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnThink()
-	if GetConVarNumber("cpt_scp_usemusic") == 1 && CurTime() > self.NextThemeSongT then
+	if GetConVar("cpt_scp_usemusic"):GetInt() == 1 && CurTime() > self.NextThemeSongT then
 		self.ThemeSong:Stop()
 		self.ThemeSong:Play()
 		self.NextThemeSongT = CurTime() +31

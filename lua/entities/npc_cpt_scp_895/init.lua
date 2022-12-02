@@ -77,7 +77,7 @@ function ENT:WhenRemoved()
 end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnThink()
-	if GetConVarNumber("cpt_scp_usemusic") == 1 then
+	if GetConVar("cpt_scp_usemusic"):GetInt() == 1 then
 		if CurTime() > self.NextThemeSongT then
 			self.ThemeSong:Stop()
 			self.ThemeSong:Play()
@@ -86,8 +86,8 @@ function ENT:OnThink()
 	end
 	if CurTime() > self.NextScareT then
 		for _,v in ipairs(player.GetAll()) do
-			if v:IsValid() && v:Alive() && GetConVarNumber("ai_ignoreplayers") == 0 && v:GetNWBool("SCP_895Horror") == false then
-				if v:GetNWBool("SCP_HasNightvision") == true || (GetConVarNumber("cpt_scp_895attack") == 1) then
+			if v:IsValid() && v:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0 && v:GetNWBool("SCP_895Horror") == false then
+				if v:GetNWBool("SCP_HasNightvision") == true || (GetConVar("cpt_scp_895attack"):GetInt() == 1) then
 					if self:GetClosestPoint(v) <= 895 then
 						self:CreateGrossImage(v)
 					end
@@ -100,7 +100,7 @@ end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnInputAccepted(event,activator)
 	if CurTime() > self.NextUseT then
-		if event == "Use" && IsValid(activator) && activator:IsPlayer() && activator:Alive() && GetConVarNumber("ai_ignoreplayers") == 0 then
+		if event == "Use" && IsValid(activator) && activator:IsPlayer() && activator:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0 then
 			activator:ChatPrint("You place your hand on the coffin and feel a very cold sensation go down your back. Maybe it's best if you leave..")
 			if math.random(1,50) == 1 then
 				self:CreateGrossImage(activator)

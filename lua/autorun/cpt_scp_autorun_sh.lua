@@ -92,7 +92,6 @@ CPTBase.AddNPC( "Nightvision Goggles", "ent_cpt_scp_nightvision", category ) -- 
 local NPC_Meta = FindMetaTable( "NPC" )
 local SCP_SightAngle = 50
 local scpSightAngTrig = math.cos( math.rad( SCP_SightAngle ) )
-SCP_GlobalNTFCoolDown = 0
 SCP_DoorOpenDistance = 100
 
 function NPC_Meta:SCP_IsPlayerBlinking()
@@ -111,7 +110,7 @@ function NPC_Meta:SCP_CanBeSeenData()
 	local scpVec = self:GetPos() + self:OBBCenter() + self:GetForward() * -30 -- Rework note: What is this magic number here for?
 
 	for _, v in ipairs( player.GetAll() ) do
-		if GetConVarNumber( "ai_ignoreplayers" ) == 1 then return end
+		if GetConVar( "ai_ignoreplayers" ):GetInt() == 1 then return end
 		if not v:IsPlayer() then return end
 		if v:Visible( self ) then
 			local plyRelations = self:Disposition( v ) ~= D_LI
@@ -212,16 +211,14 @@ CPTBase.AddConVar( "cpt_scp_682theme", "0" )
 CPTBase.AddConVar( "cpt_scp_guardduty", "0" )
 
 local function CPTBase_SCP_ResetFemurBreaker( ply )
-	if ply:IsAdmin() or ply:IsSuperAdmin() then
-		if SERVER then
-			FEMURACTIVATED = false
-			NEXTFMT = 0
-			ST_FEMUR = false
-			NEXTSTT = 0
-			MN_FEMUR = false
-			NEXTMNT = 0
-		end
-	end
+	if not SERVER then return end
+	if not ( ply:IsAdmin() or ply:IsSuperAdmin() ) then return end
+	FEMURACTIVATED = false
+	NEXTFMT = 0
+	ST_FEMUR = false
+	NEXTSTT = 0
+	MN_FEMUR = false
+	NEXTMNT = 0
 end
 concommand.Add( "cpt_scp_resetfemurbreaker", CPTBase_SCP_ResetFemurBreaker )
 

@@ -26,7 +26,7 @@ end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnInputAccepted(event,activator)
 	if CurTime() > self.NextUseT then
-		if event == "Use" && activator:IsPlayer() && activator:Alive() && GetConVarNumber("ai_ignoreplayers") == 0 && activator.SCP_Using420 == false then
+		if event == "Use" && activator:IsPlayer() && activator:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0 && activator.SCP_Using420 == false then
 			activator.SCP_Using420 = true
 			activator:ChatPrint("MAN DATS SOM GOOD ASS SHIT")
 			activator:SetHealth(activator:Health() +25)
@@ -36,7 +36,7 @@ function ENT:OnInputAccepted(event,activator)
 			activator:SetRunSpeed(activator:GetRunSpeed() +100)
 			activator:EmitSound("cpthazama/scp/music/420J.mp3",50,100)
 			self:Remove()
-			timer.Simple(GetConVarNumber("cpt_scp_420effectstime"),function()
+			timer.Simple(GetConVar("cpt_scp_420effectstime"):GetInt(),function()
 				if IsValid(activator) then
 					activator.SCP_Using420 = false
 					activator:SetWalkSpeed(oldspeed)

@@ -39,48 +39,46 @@ hook.Add("PlayerUse","CPTBase_SCP_106Containment",function(ply,ent)
 		else
 			MN_FEMUR = false
 		end
-		NEXTMNT = CurTime() +1
+		NEXTMNT = CurTime() + 1
 	end
-	if ent:GetName() == "femur_button" and not FEMURACTIVATED then
-		if CurTime() <= NEXTFMT then return end
-		if ST_FEMUR == true && MN_FEMUR == true then
-			timer.Simple(10,function()
-				if MN_FEMUR == true && FEMURACTIVATED == true then
-					for _,v in ipairs(ents.GetAll()) do
-						if v:IsNPC() && v:GetClass() == "npc_cpt_scp_106" then
-							v:StopCompletely()
-							v:BeContained()
-						end
-					end
+	if not ( ent:GetName() == "femur_button" and not FEMURACTIVATED ) then return end
+	if CurTime() <= NEXTFMT then return end
+	if ST_FEMUR == true and MN_FEMUR == true then
+		timer.Simple(10,function()
+			if MN_FEMUR ~= true or FEMURACTIVATED ~= true then return end
+			for _,v in ipairs(ents.GetAll()) do
+				if v:IsNPC() and v:GetClass() == "npc_cpt_scp_106" then
+					v:StopCompletely()
+					v:BeContained()
 				end
-			end)
-			FEMURACTIVATED = true
-			timer.Simple(40,function()
-				if FEMURACTIVATED == true then
-					FEMURACTIVATED = false
-				end
-			end)
-		end
-		NEXTFMT = CurTime() +1
+			end
+		end)
+		FEMURACTIVATED = true
+		timer.Simple(40,function()
+			if FEMURACTIVATED == true then
+				FEMURACTIVATED = false
+			end
+		end)
 	end
+	NEXTFMT = CurTime() + 1
 end)
 
 function util.GetSCPMapData(dataID)
-	if !CPTBASE_TBL_SCPMAPVECTORS[game.GetMap()] then
+	if not CPTBASE_TBL_SCPMAPVECTORS[game.GetMap()] then
 		return nil
 	end
 	return CPTBASE_TBL_SCPMAPVECTORS[game.GetMap()][dataID]
 end
 
 function util.AddSCPMapData(dataMap,dataVector) -- Run this in a autorun file either in a hook or just anywhere in a blank space
-	if !CPTBASE_TBL_SCPMAPVECTORS[dataMap] then
+	if not CPTBASE_TBL_SCPMAPVECTORS[dataMap] then
 		CPTBASE_TBL_SCPMAPVECTORS[dataMap] = {}
 	end
 	table.insert(CPTBASE_TBL_SCPMAPVECTORS[dataMap],dataVector)
 end
 
 function util.IsSCPMap()
-	if GetConVarNumber("cpt_scp_site19") == 0 then return false end
+	if GetConVar("cpt_scp_site19"):GetInt() == 0 then return false end
 	-- if game.GetMap() == "gm_site19" || game.GetMap() == "rp_site54" || game.GetMap() == "rp_site61_kaktusownia" then
 		-- return true
 	-- end
@@ -91,7 +89,7 @@ function util.IsSCPMap()
 end
 
 function util.IsSite19()
-	if GetConVarNumber("cpt_scp_site19") == 0 then return false end
+	if GetConVar("cpt_scp_site19"):GetInt() == 0 then return false end
 	if game.GetMap() == "gm_site19" then
 		return true
 	end

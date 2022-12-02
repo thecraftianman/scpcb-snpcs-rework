@@ -122,7 +122,7 @@ if SERVER then
 
 	function ENT:CustomThink()
 		if not util.IsSCPMap() then return end
-		if not CurTime() > self.NextDoorT then return end
+		if CurTime() <= self.NextDoorT then return end
 		for _,v in ipairs( ents.FindInSphere( self:GetPos(), SCP_DoorOpenDistance ) ) do
 			if not v:IsValid() then return end
 			if not v:DrG_IsDoor() then return end

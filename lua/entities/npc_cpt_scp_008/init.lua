@@ -102,7 +102,7 @@ function ENT:OnThink()
 			self.NextChangeDistT = CurTime() +0.5
 		end
 		for _,v in ipairs(ents.FindInSphere(self:GetPos(),self.InfectionDistance)) do
-			if IsValid(v) && v != self && v:GetClass() != self:GetClass() && (v:IsNPC() || (v:IsPlayer() && GetConVarNumber("ai_ignoreplayers") == 0)) then
+			if IsValid(v) && v != self && v:GetClass() != self:GetClass() && (v:IsNPC() || (v:IsPlayer() && GetConVar("ai_ignoreplayers"):GetInt() == 0)) then
 				if v:IsNPC() && v.Faction != "FACTION_SCP" then
 					self:Infect(v)
 				end
@@ -132,7 +132,7 @@ function ENT:Infect(v)
 		if v:IsPlayer() then
 			deaths = v:Deaths()
 		end
-		local time = GetConVarNumber("cpt_scp_008infectiontime")
+		local time = GetConVar("cpt_scp_008infectiontime"):GetInt()
 		timer.Simple(time /3,function()
 			if v:IsValid() && v.SCP_Infected_008 then
 				if v:IsPlayer() && v:Deaths() > deaths then return end

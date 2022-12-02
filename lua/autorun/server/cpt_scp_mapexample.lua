@@ -3,7 +3,7 @@
 	Nothing in these files or/and code may be reproduced, adapted, merged or
 	modified without prior written consent of the original author, Cpt. Hazama
 --------------------------------------------------]]--
-include('autorun/server/cpt_scp_map.lua')
+include("autorun/server/cpt_scp_map.lua")
 
 --[[
 	This will show mappers how to add their own Vectors for my SNPCs

@@ -26,7 +26,7 @@ end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnInputAccepted(event,activator)
 	if CurTime() <= self.NextUseT then return end
-	if event == "Use" && IsValid(activator) && activator:IsPlayer() && activator:Alive() && GetConVarNumber("ai_ignoreplayers") == 0 && activator.SCP_Has714 == false && CurTime() > activator.SCP_NextUse1123T then
+	if event == "Use" && IsValid(activator) && activator:IsPlayer() && activator:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0 && activator.SCP_Has714 == false && CurTime() > activator.SCP_NextUse1123T then
 		activator.SCP_NextUse1123T = CurTime() +10
 		if math.random(1,5) == 1 then
 			self:EmitSound("cpthazama/scp/1123/Horror.mp3",70,100)

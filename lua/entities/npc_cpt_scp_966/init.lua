@@ -67,9 +67,9 @@ function ENT:OnThink()
 	end
 	self:RemoveAllDecals()
 	for _,v in ipairs(ents.GetAll()) do
-		if ((v:IsNPC() && v != self && self:Disposition(v) != D_LI) || (GetConVarNumber("ai_ignoreplayers") == 0 && v:IsPlayer() && v.IsPossessing == false && v != self.Possessor)) && v:Visible(self) then
+		if ((v:IsNPC() && v != self && self:Disposition(v) != D_LI) || (GetConVar("ai_ignoreplayers"):GetInt() == 0 && v:IsPlayer() && v.IsPossessing == false && v != self.Possessor)) && v:Visible(self) then
 			if self:GetClosestPoint(v) < 500 then
-				if v:IsPlayer() && GetConVarNumber("ai_ignoreplayers") == 0 then
+				if v:IsPlayer() && GetConVar("ai_ignoreplayers"):GetInt() == 0 then
 					if v.CPTBase_SCP966_ChatT == nil then v.CPTBase_SCP966_ChatT = 0 end
 					local rand = math.random(1,3)
 					if CurTime() > v.CPTBase_SCP966_ChatT then
@@ -83,7 +83,7 @@ function ENT:OnThink()
 						v.CPTBase_SCP966_ChatT = CurTime() +math.Rand(12,20)
 					end
 				end
-				if GetConVarNumber("cpt_scp_realistic966") == 0 then
+				if GetConVar("cpt_scp_realistic966"):GetInt() == 0 then
 					self:SetNoDraw(false)
 				end
 			else

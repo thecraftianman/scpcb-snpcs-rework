@@ -53,7 +53,7 @@ function ENT:SetInit()
 	-- end
 	self.NextDamageT = 0
 	self.NextTeleportT = 0
-	timer.Simple(GetConVarNumber("cpt_scp_513effectstime"),function()
+	timer.Simple(GetConVar("cpt_scp_513effectstime"):GetInt(),function()
 		if self:IsValid() then
 			self:Remove()
 		end

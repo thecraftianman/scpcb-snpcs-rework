@@ -52,7 +52,7 @@ function ENT:Possess_OnPossessed(possessor)
 end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:BeforeTakeDamage(dmg,hitbox)
-	if GetConVarNumber("cpt_scp_106damage") == 0 then
+	if GetConVar("cpt_scp_106damage"):GetInt() == 0 then
 		if dmg:GetDamageType() == DMG_SHOCK || dmg:GetDamageType() == DMG_DISSOLVE || ((dmg:GetAttacker():GetClass() == "trigger_hurt" || dmg:GetAttacker():GetClass() == "func_movelinear") && util.IsSCPMap()) then
 			return true
 		else
@@ -476,7 +476,7 @@ function ENT:OnThink()
 		if !self.IsPossessed && self:CanPerformProcess() && CurTime() > self.NextRandomTeleportT && math.random(1,80) == 1 then
 			local tb = {}
 			for _,v in ipairs(ents.GetAll()) do
-				if IsValid(v) && ((v:IsNPC() && v != self && self:Disposition(v) != D_LI) || (v:IsPlayer() && GetConVarNumber("ai_ignoreplayers") == 0 && v:Alive() && !v:GetNWBool("CPTBase_IsPossessing"))) then
+				if IsValid(v) && ((v:IsNPC() && v != self && self:Disposition(v) != D_LI) || (v:IsPlayer() && GetConVar("ai_ignoreplayers"):GetInt() == 0 && v:Alive() && !v:GetNWBool("CPTBase_IsPossessing"))) then
 					table.insert(tb,v)
 				end
 			end
@@ -486,7 +486,7 @@ function ENT:OnThink()
 			self.NextRandomTeleportT = CurTime() +math.Rand(30,40)
 		end
 	end
-	if GetConVarNumber("cpt_scp_usemusic") == 1 && CurTime() > self.NextThemeSongT then
+	if GetConVar("cpt_scp_usemusic"):GetInt() == 1 && CurTime() > self.NextThemeSongT then
 		self.ThemeSong:Stop()
 		self.ThemeSong:Play()
 		self.NextThemeSongT = CurTime() +30
@@ -500,7 +500,7 @@ function ENT:OnThink()
 	local cantpp = false
 	if self.point != nil && self.point:IsValid() && self.point:GetPos():Distance(self:GetPos()) > 800 && !self.point:Visible(self) then
 		for _,v in ipairs(ents.FindInSphere(self.point:GetPos(),250)) do
-			if (v:IsNPC() && v != self && v:GetClass() != self:GetClass() && v:Disposition(self) != D_LI) || (v:IsPlayer() && v:Alive() && GetConVarNumber("ai_ignoreplayers") == 0) && CurTime() > self.NextTeleportToPointT then
+			if (v:IsNPC() && v != self && v:GetClass() != self:GetClass() && v:Disposition(self) != D_LI) || (v:IsPlayer() && v:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0) && CurTime() > self.NextTeleportToPointT then
 				v:SetNWBool("CPTBase_SCP106_Highlight",true)
 				cantpp = true
 			end

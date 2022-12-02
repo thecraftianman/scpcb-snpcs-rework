@@ -26,7 +26,7 @@ end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnInputAccepted(event,activator)
 	if CurTime() > self.NextUseT then
-		if event == "Use" && activator:IsPlayer() && activator:Alive() && GetConVarNumber("ai_ignoreplayers") == 0 && activator.SCP_Has005 == false then
+		if event == "Use" && activator:IsPlayer() && activator:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0 && activator.SCP_Has005 == false then
 			activator:ChatPrint("You pick up SCP-005. You can now unlock any door you want.")
 			activator.SCP_Has005 = true
 			self:EmitSound("physics/metal/soda_can_impact_soft1.wav",50,100)

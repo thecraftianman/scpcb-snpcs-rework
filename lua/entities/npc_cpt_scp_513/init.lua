@@ -32,7 +32,7 @@ end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnInputAccepted(event,activator)
 	if CurTime() > self.NextUseT then
-		if event == "Use" && activator:IsPlayer() && activator:Alive() && GetConVarNumber("ai_ignoreplayers") == 0 && activator.SCP_Has714 == false then
+		if event == "Use" && activator:IsPlayer() && activator:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0 && activator.SCP_Has714 == false then
 			activator:ChatPrint("You pick up SCP-513 and feel a cold sensation on your back..")
 			self:EmitSound("physics/metal/weapon_footstep1.wav",72,100)
 			self:Remove()
@@ -45,7 +45,7 @@ function ENT:OnInputAccepted(event,activator)
 					curse:Spawn()
 					curse:Activate()
 					local deaths = activator:Deaths()
-					timer.Simple(GetConVarNumber("cpt_scp_513effectstime"),function()
+					timer.Simple(GetConVar("cpt_scp_513effectstime"):GetInt(),function()
 						if activator:IsValid() then
 							if activator:Deaths() > deaths then return end
 							activator:ChatPrint("The curse of SCP-513 feels as though it has worn off and you drop the bell..")

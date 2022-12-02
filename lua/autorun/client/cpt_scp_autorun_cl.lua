@@ -4,8 +4,8 @@ local IsValid = IsValid
 local haloColor895 = Color( 255, 0, 0 )
 local haloColor079 = Color( 0, 161, 255 )
 local haloColor106 = Color( 127, 0, 0 )
-local hudWhite = color_white:Unpack()
-local hudClear = color_transparent:Unpack()
+local hudWhite = 255, 255, 255, 255
+local hudClear = 0, 0, 0, 0
 local hudWhiteClear = 255, 255, 255, 100
 
 local tab_nightvision = {
@@ -84,8 +84,8 @@ hook.Add( "PreDrawHalos", "CPTBase_SCP_Nightvision895", function()
 end )
 
 local CLIENT_SCP_178 = false
-local CLIENT_SCP_178SPAWNTIME = CurTime()
-local CLIENT_SCP_178SPAWNAMOUNT = 0
+-- local CLIENT_SCP_178SPAWNTIME = CurTime()
+-- local CLIENT_SCP_178SPAWNAMOUNT = 0
 concommand.Add( "cpt_scp_toggle178", function( ply, cmd, args )
 	CLIENT_SCP_178 = not CLIENT_SCP_178
 end )
@@ -148,10 +148,10 @@ net.Receive( "SCP_1048_Bleed", function() -- Rework note: This new way functions
 	timer.Create( "SCP_1048_BleedEffect", 1, 24, function()
 		for _, v in ipairs( hitPlys ) do
 			if not IsValid( v ) then return end
-      		if v:Health() <= 0 then return end
-      		if v.SCP_Inflicted_1048a == false then return end
+			if v:Health() <= 0 then return end
+			if v.SCP_Inflicted_1048a == false then return end
 			for i = 0, v:GetBoneCount() - 1 do
-				if v:GetBonePosition( i ) ~= v:GetPos() then
+				if v:GetBonePosition( i ) ~= v:GetPos() then -- and math.random(1,250) == 1 then
 					ParticleEffect( "blood_impact_red_01", v:GetBonePosition( i ), Angle( 0, 0, 0 ), v )
 				end
 			end
@@ -169,15 +169,13 @@ local menuDropName = "CPTBase"
 local menuTabName = "SCP:CB SNPCs"
 
 local function CPTBaseMenu_SCP_SNPC( panel )
-	if not game.SinglePlayer() then
-		if not LocalPlayer():IsAdmin() or not LocalPlayer():IsSuperAdmin() then
-			panel:AddControl( "CheckBox", { Label = "Remind you when you're going to blink?", Command = "cpt_scp_blinkmessage" } )
-			panel:AddControl( "Label", { Text = "Only admins can access the other settings!" } )
-			return
-		end
+	if not game.SinglePlayer() and not ( LocalPlayer():IsAdmin() or LocalPlayer():IsSuperAdmin() ) then
+		panel:AddControl( "CheckBox", { Label = "Remind you when you're going to blink?", Command = "cpt_scp_blinkmessage" } )
+		panel:AddControl( "Label", { Text = "Only admins can access the other settings!" } )
+		return
 	end
-	local CPTBaseMenu_SCP_SNPC = { Options = {}, CVars = {}, Label = "#Presets", MenuButton = "1", Folder = "SCP SNPCs Settings" }
-	CPTBaseMenu_SCP_SNPC.Options["#Default"] = {
+	local CPTBaseMenu_SCP_SNPCMenu = { Options = {}, CVars = {}, Label = "#Presets", MenuButton = "1", Folder = "SCP SNPCs Settings" }
+	CPTBaseMenu_SCP_SNPCMenu.Options["#Default"] = {
 		cpt_scp_008infectiontime = "200",
 		cpt_scp_049infectiontime = "150",
 		cpt_scp_420effectstime = "20",
@@ -253,27 +251,26 @@ hook.Add( "PreDrawHalos", "CPTBase_SCP_106Possession", function()
 
 	for _, ply in ipairs( player.GetAll() ) do
 		if not IsValid( ply ) then return end
-		if ply:GetNWBool( "CPTBase_IsPossessing" ) and ply:GetNWBool( "CPTBase_PossessedNPCClass" ) == "npc_cpt_scp_106" then
-			halo.Add( tb_point, haloColor106, 4, 4, 3, true, true )
-			for _, others in ipairs( ents.GetAll() ) do
-				if ( others:IsNPC() and others:GetClass() ~= "npc_cpt_scp_106" ) or ( others:IsPlayer() and others ~= v ) then
-					for _, point in ipairs( tb_point ) do
-						if others:GetPos():Distance( point:GetPos() ) <= 250 then
-							table.insert( tb, others )
-						else
-							if tb[others] then
-								tb[others] = nil
-							end
-						end
+		if not ply:GetNWBool( "CPTBase_IsPossessing" ) then return end
+		if ply:GetNWString( "CPTBase_PossessedNPCClass" ) ~= "npc_cpt_scp_106" then return end
+		halo.Add( tb_point, haloColor106, 4, 4, 3, true, true )
+		for _, others in ipairs( ents.GetAll() ) do
+			if not ( others:IsNPC() and others:GetClass() ~= "npc_cpt_scp_106" ) and not ( others:IsPlayer() and others ~= ply ) then return end
+			for _, point in ipairs( tb_point ) do
+				if others:GetPos():Distance( point:GetPos() ) <= 250 then
+					table.insert( tb, others )
+				else
+					if tb[others] then
+						tb[others] = nil
 					end
 				end
 			end
-			halo.Add( tb, haloColor106, 4, 4, 3, true, true )
 		end
+		halo.Add( tb, haloColor106, 4, 4, 3, true, true )
 	end
 end )
 
-hook.Add( "RenderScreenspaceEffects", "CPTBase_SCP_079Possessor", function()
+hook.Add( "PreDrawHalos", "CPTBase_SCP_079Possessor", function()
 	local tbl = {}
 	for _, ply in ipairs( player.GetAll() ) do
 		if not IsValid( ply ) then return end

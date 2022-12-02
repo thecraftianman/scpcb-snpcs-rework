@@ -51,16 +51,16 @@ function ENT:SetInit()
 	self:SetMovementType(MOVETYPE_STEP)
 	self.IsAttacking = false
 	self.NextDoorT = 0
-	self.ViewDistance = GetConVarNumber("cpt_scp_939viewdistance")
-	if GetConVarNumber("cpt_scp_939smallcollision") == 1 then
+	self.ViewDistance = GetConVar("cpt_scp_939viewdistance"):GetInt()
+	if GetConVar("cpt_scp_939smallcollision"):GetInt() == 1 then
 		self.CollisionBounds = Vector(0,0,0)
 	else
-		self:SetCollisionBounds(Vector(65,48,55),-(Vector(65,48,0))) // Should fix getting stuck
+		self:SetCollisionBounds(Vector(65,48,55),-(Vector(65,48,0))) -- Should fix getting stuck
 	end
 	self.NextHearSoundT = CurTime()
-	self.NextSpotSoundT = CurTime() +0.5
+	self.NextSpotSoundT = CurTime() + 0.5
 	self.NextVoiceSoundT = CurTime()
-	if GetConVarNumber("cpt_scp_939slsounds") == 1 then
+	if GetConVar("cpt_scp_939slsounds"):GetInt() == 1 then
 		self.tbl_Sounds["Attack"] = {"cpthazama/scp/939/SL_Attack1.mp3","cpthazama/scp/939/SL_Attack2.mp3","cpthazama/scp/939/SL_Attack3.mp3"}
 	else
 		self.tbl_Sounds["Attack"] = {}
@@ -117,7 +117,7 @@ function ENT:LocateEnemies()
 					return v
 				end
 			end
-		elseif self.FriendlyToPlayers == false && GetConVarNumber("ai_ignoreplayers") == 0 && v:IsPlayer() && v:Alive() && !v.IsPossessing && v != self.Possessor then
+		elseif self.FriendlyToPlayers == false && GetConVar("ai_ignoreplayers"):GetInt() == 0 && v:IsPlayer() && v:Alive() && !v.IsPossessing && v != self.Possessor then
 			if ((v:GetVelocity():Length() > 5 && v:GetVelocity().z <= 0) && self:CanSeeEntities(v) && self:FindInCone(v,self.ViewAngle)) && v.IsPossessing != true && v.Faction != "FACTION_NONE" then
 				if self:GetFaction() != "FACTION_PLAYER" && self.Faction != v.Faction && self:Disposition(v) != D_LI && !table.HasValue(self.tbl_BlackList,v) then
 					return v
@@ -170,7 +170,7 @@ function ENT:OnThink()
 		self.NextVoiceSoundT = CurTime() +1
 	end
 	for _,v in ipairs(player.GetAll()) do
-		if (GetConVarNumber("ai_ignoreplayers") == 0 && v.IsPossessing == false && v != self.Possessor) && !v:Visible(self) then
+		if (GetConVar("ai_ignoreplayers"):GetInt() == 0 && v.IsPossessing == false && v != self.Possessor) && !v:Visible(self) then
 			if self:GetClosestPoint(v) < 1000 then
 				if v.CPTBase_SCP939_ChatT == nil then v.CPTBase_SCP939_ChatT = 0 end
 				local rand = math.random(1,3)
@@ -217,7 +217,7 @@ end
 function ENT:DoAttack()
 	if self:CanPerformProcess() == false then return end
 	if (!self.IsPossessed && IsValid(self:GetEnemy()) && !self:GetEnemy():Visible(self)) then return end
-	if GetConVarNumber("cpt_scp_939slsounds") == 1 then
+	if GetConVar("cpt_scp_939slsounds"):GetInt() == 1 then
 		self:PlaySound("Attack",75)
 	end
 	self:PlayNPCGesture("attack",2,1)

@@ -43,7 +43,7 @@ function ENT:OnThink()
 		if CurTime() > self.NextEarRapeT && math.random(1,10) == 1 then
 			local tb = {}
 			for _,v in ipairs(ents.FindInSphere(self:GetPos(),500)) do
-				if v:IsValid() && ((v:IsNPC() && v != self && v:GetClass() != self:GetClass()) || (v:IsPlayer() && v:Alive() && GetConVarNumber("ai_ignoreplayers") == 0)) then
+				if v:IsValid() && ((v:IsNPC() && v != self && v:GetClass() != self:GetClass()) || (v:IsPlayer() && v:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0)) then
 					table.insert(tb,v)
 				end
 			end
@@ -61,7 +61,7 @@ function ENT:OnThink()
 				util.ShakeWorld(self:GetPos(),16,23,1500)
 				self.SelectedTarget = NULL
 				for _,v in ipairs(ents.FindInSphere(self:GetPos(),500)) do
-					if v:IsValid() && ((v:IsNPC() && v != self && v:GetClass() != self:GetClass()) || (v:IsPlayer() && v:Alive() && GetConVarNumber("ai_ignoreplayers") == 0)) then
+					if v:IsValid() && ((v:IsNPC() && v != self && v:GetClass() != self:GetClass()) || (v:IsPlayer() && v:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0)) then
 						v:SetLocalVelocity(Vector(0,0,350))
 					end
 				end
@@ -84,7 +84,7 @@ function ENT:Possess_Primary(possessor)
 		util.ShakeWorld(self:GetPos(),16,23,1500)
 		self.SelectedTarget = NULL
 		for _,v in ipairs(ents.FindInSphere(self:GetPos(),500)) do
-			if v:IsValid() && ((v:IsNPC() && v != self && v:GetClass() != self:GetClass()) || (v:IsPlayer() && v:Alive() && GetConVarNumber("ai_ignoreplayers") == 0)) then
+			if v:IsValid() && ((v:IsNPC() && v != self && v:GetClass() != self:GetClass()) || (v:IsPlayer() && v:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0)) then
 				v:SetLocalVelocity(Vector(0,0,350))
 			end
 		end

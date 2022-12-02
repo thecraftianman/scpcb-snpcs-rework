@@ -1,3 +1,11 @@
+local hook_Add = hook.Add
+local math_random = math.random
+local timer_Remove = timer.Remove
+local string_find = string.find
+local table_insert = table.insert
+local timer_Simple = timer.Simple
+local math_Round = math.Round
+local string_lower = string.lower
 local IsValid = IsValid
 local CurTime = CurTime
 local ipairs = ipairs
@@ -6,10 +14,10 @@ local player_GetAll = player.GetAll
 local GetConVar = GetConVar
 
 local function CPTBase_SCP079_KillPoints( victim, inflictor, killer )
-	local canRun = false
-	local SCP = NULL
 	if not killer.CPTBase_NPC then return end
 	if killer == victim then return end
+	local canRun = false
+	local SCP = NULL
 	for _, v in ipairs( ents_FindByClass( "npc_cpt_scp_079" ) ) do
 		if v:IsNPC() then
 			canRun = true
@@ -17,21 +25,19 @@ local function CPTBase_SCP079_KillPoints( victim, inflictor, killer )
 			break
 		end
 	end
-	if canRun then
-		if #SCP.tbl_LockedDoors > 0 then
-			for _, v in ipairs( SCP.tbl_LockedDoors ) do
-				if victim:GetPos():Distance( v:GetPos() ) <= 450 then
-					SCP.ExperiencePoints = SCP.ExperiencePoints + 15
-					break
-				end
-			end
+	if not canRun then return end
+	if #SCP.tbl_LockedDoors <= 0 then return end
+	for _, v in ipairs( SCP.tbl_LockedDoors ) do
+		if victim:GetPos():Distance( v:GetPos() ) <= 450 then
+			SCP.ExperiencePoints = SCP.ExperiencePoints + 15
+			break
 		end
 	end
 end
-hook.Add( "OnNPCKilled", "CPTBase_SCP079_KillPoints_NPC", CPTBase_SCP079_KillPoints )
-hook.Add( "PlayerDeath", "CPTBase_SCP079_KillPoints_Player", CPTBase_SCP079_KillPoints )
+hook_Add( "OnNPCKilled", "CPTBase_SCP079_KillPoints_NPC", CPTBase_SCP079_KillPoints )
+hook_Add( "PlayerDeath", "CPTBase_SCP079_KillPoints_Player", CPTBase_SCP079_KillPoints )
 
-hook.Add( "PlayerSpawn", "CPTBase_SCP_SpawnData", function( ply )
+hook_Add( "PlayerSpawn", "CPTBase_SCP_SpawnData", function( ply )
 	if CLIENT then
 		ply:SetNWBool( "SCP_HasNightvision", false )
 		ply:SetNWBool( "SCP_IsBeingDrained", false )
@@ -41,7 +47,7 @@ hook.Add( "PlayerSpawn", "CPTBase_SCP_SpawnData", function( ply )
 		ply:SetNWBool( "SCP_IsBlinking", false )
 		ply:SetNWBool( "SCP_Touched1123", false )
 		ply:SetNWBool( "SCP_Touched1123_Horror", false )
-		ply:SetNWInt( "SCP_BlinkTime", CurTime() + math.random( 4, 7 ) )
+		ply:SetNWInt( "SCP_BlinkTime", CurTime() + math_random( 4, 7 ) )
 		ply:SetNWInt( "SCP_LastBlinkAmount", 0 )
 	end
 	ply.SCP_Infected_008 = false
@@ -62,8 +68,8 @@ hook.Add( "PlayerSpawn", "CPTBase_SCP_SpawnData", function( ply )
 	ply.SCP_SpawnedZombieEntity = false
 end )
 
-hook.Add( "PlayerDeath", "CPTBase_SCP_DeathData", function( ply )
-	timer.Remove( "SCP_1048_BleedEffect" )
+hook_Add( "PlayerDeath", "CPTBase_SCP_DeathData", function( ply )
+	timer_Remove( "SCP_1048_BleedEffect" )
 	-- if not CLIENT then return end
 	ply:SetNWBool( "SCP_HasNightvision", false )
 	ply:SetNWBool( "SCP_IsBeingDrained", false )
@@ -73,29 +79,27 @@ hook.Add( "PlayerDeath", "CPTBase_SCP_DeathData", function( ply )
 	ply:SetNWBool( "SCP_IsBlinking", false )
 	ply:SetNWBool( "SCP_Touched1123", false )
 	ply:SetNWBool( "SCP_Touched1123_Horror", false )
-	ply:SetNWInt( "SCP_BlinkTime", CurTime() + math.random( 4, 7 ) )
+	ply:SetNWInt( "SCP_BlinkTime", CurTime() + math_random( 4, 7 ) )
 	ply:SetNWInt( "SCP_LastBlinkAmount", 0 )
 	CLIENT_SCP_NV = false
 end )
 
-hook.Add( "OnEntityCreated", "CPTBase_SCP_SpawnData_NPCs", function( ent )
+hook_Add( "OnEntityCreated", "CPTBase_SCP_SpawnData_NPCs", function( ent )
 	if not ent:IsNPC() then return end
 	ent.SCP_Infected_008 = false
 	ent.SCP_IsBlinking = false
-	ent.SCP_BlinkTime = CurTime() + math.random( 4, 7 )
+	ent.SCP_BlinkTime = CurTime() + math_random( 4, 7 )
 end )
 
-hook.Add( "Think", "CPTBase_SCP_BlinkSystem_NPCs", function()
+hook_Add( "Think", "CPTBase_SCP_BlinkSystem_NPCs", function()
 	local canevenblink = false
 	local scpsAll = ents_FindByClass( "npc_cpt_scp_*" )
 	local scpCur
 
 	for i = 1, #scpsAll do
 		scpCur = scpsAll[i]
-		if scpCur:IsNPC() then
-			if scpCur:GetClass() == ( "npc_cpt_scp_173" or "npc_cpt_scp_087_b" ) then
-				canevenblink = true
-			end
+		if scpCur:IsNPC() and scpCur:GetClass() == ( "npc_cpt_scp_173" or "npc_cpt_scp_087_b" ) then
+			canevenblink = true
 		end
 	end
 
@@ -105,10 +109,8 @@ hook.Add( "Think", "CPTBase_SCP_BlinkSystem_NPCs", function()
 	for _, v in ipairs( ents_FindByClass( "npc_*" ) ) do
 		if v:IsNPC() then
 			if v:Health() <= 0 then return end
-			if not string.find( v:GetClass(), ( "173" or "087_b" ) ) then
-				if not tb[v] then
-					table.insert( tb, v )
-				end
+			if not string_find( v:GetClass(), "173" or "087_b" ) and not tb[v] then
+				table_insert( tb, v )
 			end
 		end
 	end
@@ -120,7 +122,7 @@ hook.Add( "Think", "CPTBase_SCP_BlinkSystem_NPCs", function()
 		if tb[i].SCP_IsBlinking == nil then tb[i].SCP_IsBlinking = false end
 
 		if tb[i]:GetClass() == "npc_cpt_scp_ntf" then
-			timer.Simple( math.Round( tb[i].SCP_BlinkTime - CurTime() ) - 0.8, function()
+			timer_Simple( math_Round( tb[i].SCP_BlinkTime - CurTime() ) - 0.8, function()
 				if not IsValid( tb[i] ) then return end
 				if tb[i].SCP_IsBlinking == true then return end
 				if tb[i].SCP_BeforeBlinking then
@@ -132,11 +134,11 @@ hook.Add( "Think", "CPTBase_SCP_BlinkSystem_NPCs", function()
 		if CurTime() > tb[i].SCP_BlinkTime and not tb[i].SCP_IsBlinking then
 			tb[i].SCP_IsBlinking = true
 			if not tb[i].SCP_IsBlinking then return end
-			timer.Simple( 0.5, function()
+			timer_Simple( 0.5, function()
 				if not IsValid( tb[i] ) then return end
 				if not tb[i].SCP_IsBlinking then return end
 				tb[i].SCP_IsBlinking = false
-				local time = math.random( 5, 9 )
+				local time = math_random( 5, 9 )
 				if GetConVar( "cpt_scp_173blinksame" ):GetInt() == 1 then
 					time = 5
 				end
@@ -157,7 +159,7 @@ local function AllSCPs( ply, tb )
 	end
 end
 
-hook.Add( "Think", "CPTBase_SCP_BlinkSystem", function()
+hook_Add( "Think", "CPTBase_SCP_BlinkSystem", function()
 	if GetConVar( "ai_ignoreplayers" ):GetInt() == 1 then return end
 
 	local canevenblink = false
@@ -166,12 +168,10 @@ hook.Add( "Think", "CPTBase_SCP_BlinkSystem", function()
 
 	for i = 1, #scpsAll do
 		local scp = scpsAll[i]
-		if scp:IsNPC() then
-			if scp:GetClass() == ( "npc_cpt_scp_173" or "npc_cpt_scp_087_b" ) then
-				canevenblink = true
-				if not scpsBlink[scp] then
-					table.insert( scpsBlink, scp )
-				end
+		if scp:IsNPC() and scp:GetClass() == ( "npc_cpt_scp_173" or "npc_cpt_scp_087_b" ) then
+			canevenblink = true
+			if not scpsBlink[scp] then
+				table_insert( scpsBlink, scp )
 			end
 		end
 	end
@@ -181,14 +181,12 @@ hook.Add( "Think", "CPTBase_SCP_BlinkSystem", function()
 	local tb = {}
 	for i = 1, #player_GetAll() do
 		local v = player_GetAll()[i]
-		if v:IsPlayer() then
-			if not tb[v] then
-				table.insert( tb, v )
-			end
+		if v:IsPlayer() and not tb[v] then
+			table_insert( tb, v )
 		end
 	end
 
-	for i=1, #tb do
+	for i = 1, #tb do
 		if tb[i] ~= nil then
 			if tb[i] == nil then return end
 			if tb[i]:GetNWBool( "CPTBase_IsPossessing" ) then return end
@@ -204,11 +202,11 @@ hook.Add( "Think", "CPTBase_SCP_BlinkSystem", function()
 			tb[i]:SetNWBool( "SCP_IsBlinking", true )
 			if not tb[i]:GetNWBool( "SCP_IsBlinking" ) then return end
 
-			timer.Simple( 0.5, function()
+			timer_Simple( 0.5, function()
 				if not tb[i]:IsValid() then return end
 				if not tb[i]:Alive() then return end
 				tb[i]:SetNWBool( "SCP_IsBlinking", false )
-				local time = math.random( 5, 9 )
+				local time = math_random( 5, 9 )
 				if GetConVar( "cpt_scp_173blinksame" ):GetInt() == 1 then
 					time = 5
 				end
@@ -221,12 +219,12 @@ hook.Add( "Think", "CPTBase_SCP_BlinkSystem", function()
 	end
 end )
 
-hook.Add( "PlayerUse", "CPTBase_SCP005", function( ply, ent )
+hook_Add( "PlayerUse", "CPTBase_SCP005", function( ply, ent )
 	if not ply.SCP_Has005 then return end
 	if ply.SCP_NextUnlockDoorT == nil then ply.SCP_NextUnlockDoorT = 0 end
 	if not IsValid( ent ) then return end
 	if CurTime() <= ply.SCP_NextUnlockDoorT then return end
-	if string.find( ent:GetClass(), "door" ) and string.find( ent:GetSequenceName( ent:GetSequence() ), "locked" ) then
+	if string_find( ent:GetClass(), "door" ) and string_find( ent:GetSequenceName( ent:GetSequence() ), "locked" ) then
 		ent:Fire( "Unlock" )
 		ply:ChatPrint( "Door unlocked with SCP-005" )
 		ply:ChatPrint( "SCP-005 cooldown time is 3 seconds" )
@@ -235,8 +233,8 @@ hook.Add( "PlayerUse", "CPTBase_SCP005", function( ply, ent )
 	end
 end )
 
-hook.Add( "PlayerSay", "CPTBase_SCP_CommandsChat", function( ply, spoke )
-	local lowered = string.lower( spoke )
+hook_Add( "PlayerSay", "CPTBase_SCP_CommandsChat", function( ply, spoke )
+	local lowered = string_lower( spoke )
 
 	if ply:GetNWBool( "SCP_HasNightvision" ) and lowered == "!removenvg" then
 		ply:SetNWBool( "SCP_HasNightvision", false )

@@ -52,6 +52,8 @@ ENT.tbl_Sounds = {
 }
 
 ENT.tbl_Capabilities = {CAP_OPEN_DOORS,CAP_USE}
+
+local SCP_GlobalNTFCoolDown = 0
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:SCP_BeforeBlinking()
 	if CurTime() > self.NextBlinkingSoundT then
@@ -125,7 +127,7 @@ function ENT:SetInit()
 		end
 	end
 	if table.Count(allnpcs) == 0 then
-		if GetConVarNumber("cpt_scp_ntfannouncer") == 1 && util.IsSCPMap() then
+		if GetConVar("cpt_scp_ntfannouncer"):GetInt() == 1 && util.IsSCPMap() then
 			if CurTime() > SCP_GlobalNTFCoolDown then
 				for _,v in ipairs(player.GetAll()) do
 					v:SendLua("surface.PlaySound('cpthazama/scp/ntf/Announc.mp3')")
@@ -145,7 +147,7 @@ end
 function ENT:Leader_Announcements()
 	timer.Simple(60,function()
 		if self:IsValid() then
-			if GetConVarNumber("cpt_scp_ntfannouncer") == 1 then
+			if GetConVar("cpt_scp_ntfannouncer"):GetInt() == 1 then
 				for _,v in ipairs(player.GetAll()) do
 					v:SendLua("surface.PlaySound('cpthazama/scp/ntf/AnnouncAfter1.mp3')")
 				end
@@ -154,7 +156,7 @@ function ENT:Leader_Announcements()
 	end)
 	timer.Simple(120,function()
 		if self:IsValid() then
-			if GetConVarNumber("cpt_scp_ntfannouncer") == 1 then
+			if GetConVar("cpt_scp_ntfannouncer"):GetInt() == 1 then
 				for _,v in ipairs(player.GetAll()) do
 					v:SendLua("surface.PlaySound('cpthazama/scp/ntf/AnnouncAfter2.mp3')")
 				end
@@ -163,7 +165,7 @@ function ENT:Leader_Announcements()
 	end)
 	timer.Simple(160,function()
 		if self:IsValid() then
-			if GetConVarNumber("cpt_scp_ntfannouncer") == 1 then
+			if GetConVar("cpt_scp_ntfannouncer"):GetInt() == 1 then
 				for _,v in ipairs(player.GetAll()) do
 					v:SendLua("surface.PlaySound('cpthazama/scp/ntf/AnnouncCameraCheck.mp3')")
 				end
@@ -172,7 +174,7 @@ function ENT:Leader_Announcements()
 	end)
 	timer.Simple(210,function()
 		if self:IsValid() then
-			if GetConVarNumber("cpt_scp_ntfannouncer") == 1 then
+			if GetConVar("cpt_scp_ntfannouncer"):GetInt() == 1 then
 				for _,v in ipairs(player.GetAll()) do
 					v:SendLua("surface.PlaySound('cpthazama/scp/ntf/AnnouncCameraFound1.mp3')")
 				end
@@ -181,7 +183,7 @@ function ENT:Leader_Announcements()
 	end)
 	timer.Simple(320,function()
 		if self:IsValid() then
-			if GetConVarNumber("cpt_scp_ntfannouncer") == 1 then
+			if GetConVar("cpt_scp_ntfannouncer"):GetInt() == 1 then
 				for _,v in ipairs(player.GetAll()) do
 					v:SendLua("surface.PlaySound('cpthazama/scp/ntf/ThreatAnnouncPossession.mp3')")
 				end
@@ -190,7 +192,7 @@ function ENT:Leader_Announcements()
 	end)
 	timer.Simple(math.random(400,600),function()
 		if self:IsValid() then
-			if GetConVarNumber("cpt_scp_ntfannouncer") == 1 then
+			if GetConVar("cpt_scp_ntfannouncer"):GetInt() == 1 then
 				for _,v in ipairs(player.GetAll()) do
 					v:SendLua("surface.PlaySound('cpthazama/scp/ntf/ThreatAnnounc3.mp3')")
 				end
@@ -199,7 +201,7 @@ function ENT:Leader_Announcements()
 	end)
 	timer.Simple(720,function()
 		if self:IsValid() then
-			if GetConVarNumber("cpt_scp_ntfannouncer") == 1 then
+			if GetConVar("cpt_scp_ntfannouncer"):GetInt() == 1 then
 				for _,v in ipairs(player.GetAll()) do
 					v:SendLua("surface.PlaySound('cpthazama/scp/ntf/ThreatAnnouncFinal.mp3')")
 				end
@@ -243,7 +245,7 @@ function ENT:OnEnemyChanged(ent)
 end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnKilledEnemy(v)
-	if GetConVarNumber("cpt_scp_ntfannouncer") == 1 && util.IsSCPMap() then
+	if GetConVar("cpt_scp_ntfannouncer"):GetInt() == 1 && util.IsSCPMap() then
 		if v:IsNPC() then
 			if string.find(v:GetClass(),"173") then
 				for _,v in ipairs(player.GetAll()) do
@@ -459,7 +461,7 @@ function ENT:OnThink()
 						didremove = true
 					end
 				end
-				if GetConVarNumber("cpt_scp_ntfannouncer") == 1 then
+				if GetConVar("cpt_scp_ntfannouncer"):GetInt() == 1 then
 					if didremove == true then
 						local glbchance = math.random(1,3)
 						local glbsound
@@ -551,7 +553,7 @@ end
 function ENT:HandleSchedules(enemy,dist,nearest,disp,time)
 	if self.IsPossessed then return end
 	if(disp == D_HT) then
-		if GetConVarNumber("cpt_scp_ntfhiding") == 1 then
+		if GetConVar("cpt_scp_mtfhiding"):GetInt() == 1 then
 			if enemy:GetClass() == "npc_cpt_scp_096" && !enemy.IsTriggered then self:Hide("Walk") return end
 			if enemy:GetClass() == "npc_cpt_scp_106" then self:Hide("Run") return end
 			if enemy:GetClass() == "npc_cpt_scp_049" then self:Hide("Run") return end

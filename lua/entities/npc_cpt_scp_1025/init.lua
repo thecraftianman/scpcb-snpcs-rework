@@ -36,7 +36,7 @@ end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnInputAccepted(event,activator)
 	if CurTime() > self.NextUseT then
-		if event == "Use" && IsValid(activator) && activator:IsPlayer() && activator:Alive() && GetConVarNumber("ai_ignoreplayers") == 0 && activator.SCP_Has714 == false then
+		if event == "Use" && IsValid(activator) && activator:IsPlayer() && activator:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0 && activator.SCP_Has714 == false then
 			local disease = self:SelectFromTable(self.tbl_Diseases)
 			if disease == "Lung Cancer" then activator.SCP_Disease_LungCancer = true end
 			if disease == "Appendicitis" then activator.SCP_Disease_Appendicitis = true end

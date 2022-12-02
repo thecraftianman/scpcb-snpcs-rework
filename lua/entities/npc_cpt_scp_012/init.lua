@@ -39,7 +39,7 @@ function ENT:OnThink()
 	end
 	local tb = {}
 	for _,v in pairs(ents.FindInSphere(self:GetPos(),600)) do
-		if v:IsValid() && ((v:IsPlayer() && v:Alive() && GetConVarNumber("ai_ignoreplayers") == 0 && v.SCP_Has714 == false) || (v:IsNPC() && v != self && v:Disposition(self) != D_LI)) && v:Visible(self) then
+		if v:IsValid() && ((v:IsPlayer() && v:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0 && v.SCP_Has714 == false) || (v:IsNPC() && v != self && v:Disposition(self) != D_LI)) && v:Visible(self) then
 			if v:IsPlayer() then
 				v:SetEyeAngles((self:GetPos() -v:GetShootPos()):Angle())
 				if v.SCP_513_CurrentTalk == nil then
@@ -85,7 +85,7 @@ function ENT:OnThink()
 	end
 	for _,yesvapitation in ipairs(tb) do
 		if yesvapitation == nil then return end
-		if yesvapitation:GetPos():Distance(self:GetPos()) > 600 || !yesvapitation:Visible(self) || (yesvapitation:IsPlayer() && GetConVarNumber("ai_ignoreplayers") == 1) then
+		if yesvapitation:GetPos():Distance(self:GetPos()) > 600 || !yesvapitation:Visible(self) || (yesvapitation:IsPlayer() && GetConVar("ai_ignoreplayers"):GetInt() == 1) then
 			tb[yesvapitation] = nil
 		end
 	end

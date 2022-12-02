@@ -519,7 +519,7 @@ function ENT:OnThink()
 	if self.HasBeenSpokenTo == false && self.CanBeSpokenTo == true then
 		for _,v in ipairs(ents.FindInSphere(self:GetPos(),500)) do
 			if v:IsValid() && v:Visible(self) then
-				if (v:IsPlayer() && v:Alive() && GetConVarNumber("ai_ignoreplayers") == 0) then
+				if (v:IsPlayer() && v:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0) then
 					self.HasBeenSpokenTo = true
 				end
 			end

@@ -78,7 +78,7 @@ function ENT:SetInit()
 	self.P_NextVentT = CurTime() +2
 	self.NextAlertSoundShitT = 0
 	self.LastVent = Vector(0,0,0)
-	self:SetSkin(GetConVarNumber("cpt_scp_halloween"))
+	self:SetSkin(GetConVar("cpt_scp_halloween"):GetInt())
 	self.NextSplitT = CurTime() +10
 	self.tbl_Hive = {}
 	self.NextHiveT = CurTime() +1
@@ -183,7 +183,7 @@ function ENT:HandleEvents(...)
 end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnSeen()
-	if GetConVarNumber("ai_ignoreplayers") == 1 then return end
+	if GetConVar("ai_ignoreplayers"):GetInt() == 1 then return end
 	if self.IsContained then return end
 	if CurTime() > self.NextAlertSoundShitT then
 		-- self:PlaySound("Horror",100)
@@ -201,7 +201,7 @@ function ENT:OnThink()
 		self.IdleMoveSound:Stop()
 		return
 	end
-	if GetConVarNumber("cpt_scp_173revision") == 1 then
+	if GetConVar("cpt_scp_173revision"):GetInt() == 1 then
 		if self.NextHiveT == nil then self.NextHiveT = 0 end
 		if self.tbl_Hive == nil then self.tbl_Hive = {} end
 		if CurTime() > self.NextHiveT then
@@ -247,7 +247,7 @@ function ENT:OnThink()
 		self.IsRangeAttacking = false
 		self.WanderChance = 25
 		self:SetMaxYawSpeed(300)
-		if GetConVarNumber("cpt_scp_173slsounds") == 0 then
+		if GetConVar("cpt_scp_173slsounds"):GetInt() == 0 then
 			if self:IsMoving() then
 				if CurTime() > self.NextMoveSoundT then
 					self.IdleMoveSound:Stop()
@@ -269,7 +269,7 @@ function ENT:OnThink()
 		end
 		self.MeleeAttackDistance = 60
 		self.MeleeAttackDamageDistance = 80
-		if GetConVarNumber("cpt_scp_173revision") == 1 then
+		if GetConVar("cpt_scp_173revision"):GetInt() == 1 then
 			if CurTime() > self.NextSplitT then
 				if math.random(1,2000) == 1 then
 					if SERVER then
