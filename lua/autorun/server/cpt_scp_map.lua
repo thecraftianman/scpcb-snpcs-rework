@@ -5,7 +5,7 @@
 --------------------------------------------------]]--
 -- include('server/cpt_utilities.lua')
 
-CPTBASE_TBL_SCPMAPVECTORS = { -- Don't touch these
+local CPTBASE_TBL_SCPMAPVECTORS = { -- Don't touch these
 	["gm_site19"] = {},
 	["rp_site54"] = {},
 	["rp_site61_kaktusownia"] = {},

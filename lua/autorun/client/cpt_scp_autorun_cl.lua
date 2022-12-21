@@ -4,9 +4,11 @@ local IsValid = IsValid
 local haloColor895 = Color( 255, 0, 0 )
 local haloColor079 = Color( 0, 161, 255 )
 local haloColor106 = Color( 127, 0, 0 )
-local hudWhite = 255, 255, 255, 255
-local hudClear = 0, 0, 0, 0
+local hudWhite = color_white:Unpack()
+local hudClear = color_transparent:Unpack()
 local hudWhiteClear = 255, 255, 255, 100
+local blinkMat = Material( "overlay/blink" )
+local horrorNotTouchedMat = Material( "engine/singlecolor" )
 
 local tab_nightvision = {
 	["$pp_colour_addr"] = 0,
@@ -99,7 +101,7 @@ hook.Add( "HUDPaint", "CPTBase_SCP_SetBlinkTexture", function()
 
 	if ply:GetNWBool( "SCP_IsBlinking" ) and ply:Alive() then
 		surface.SetDrawColor( hudWhite )
-		surface.SetMaterial( Material( "overlay/blink" ) )
+		surface.SetMaterial( blinkMat )
 		surface.DrawTexturedRect( 0, 0, scrW, scrH )
 		surface.SetDrawColor( hudClear )
 		surface.DrawRect( 0, 0, scrW, scrH )
@@ -127,7 +129,7 @@ hook.Add( "HUDPaint", "CPTBase_SCP_SetBlinkTexture", function()
 
 	if not ply:GetNWBool( "SCP_Touched1123_Horror" ) then
 		surface.SetDrawColor( hudWhite )
-		surface.SetMaterial( Material( "engine/singlecolor" ) )
+		surface.SetMaterial( horrorNotTouchedMat )
 		surface.DrawTexturedRect( 0, 0, scrW, scrH )
 		surface.SetDrawColor( hudClear )
 		surface.DrawRect( 0, 0, scrW, scrH )

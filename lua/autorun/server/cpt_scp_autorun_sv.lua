@@ -1,3 +1,4 @@
+local util_AddNetworkString = SERVER and util.AddNetworkString
 local hook_Add = hook.Add
 local math_random = math.random
 local timer_Remove = timer.Remove
@@ -12,6 +13,8 @@ local ipairs = ipairs
 local ents_FindByClass = ents.FindByClass
 local player_GetAll = player.GetAll
 local GetConVar = GetConVar
+
+util_AddNetworkString("SCP_1048_BleedStart")
 
 local function CPTBase_SCP079_KillPoints( victim, inflictor, killer )
 	if not killer.CPTBase_NPC then return end

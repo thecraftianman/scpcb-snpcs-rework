@@ -64,7 +64,7 @@ function ENT:BeforeTakeDamage(dmg,hitbox)
 end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:SetInit()
-	PrintTable(CPTBASE_TBL_SCPMAPVECTORS)
+	-- PrintTable(CPTBASE_TBL_SCPMAPVECTORS)
 	self:SetHullType(HULL_HUMAN)
 	self:SetMovementType(MOVETYPE_STEP)
 	self.IsContained = false

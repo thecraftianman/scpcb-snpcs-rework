@@ -1,8 +1,6 @@
 if not CPTBase then return end
-AddCSLuaFile('shared.lua')
-include('shared.lua')
-
-util.AddNetworkString("SCP_1048_Bleed")
+AddCSLuaFile("shared.lua")
+include("shared.lua")
 
 ENT.ModelTable = {"models/cpthazama/scp/1048.mdl"}
 ENT.StartHealth = 200
@@ -45,7 +43,7 @@ end
 function ENT:HandleEvents(...)
 	local event = select(1,...)
 	local arg1 = select(2,...)
-	if(event == "emit") then
+	if event == "emit" then
 		if arg1 == "step" then
 			self:PlaySound("FootStep",45,90,250,true)
 		end
@@ -77,39 +75,37 @@ function ENT:OnHitEntity(hitents,hitpos)
 		end
 	end
 
-	net.Start("SCP_1048_Bleed")
+	net.Start("SCP_1048_BleedStart")
 		net.WriteTable(hitPlys)
 	net.Broadcast()
 end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:OnThink()
-	if !self.IsPossessed then
-		if self:CanPerformProcess() then
-			local dist = 0
-			if IsValid(self:GetEnemy()) then
-				dist = self:GetClosestPoint(self:GetEnemy())
-			end
-			if IsValid(self:GetEnemy()) && self.IsTransformed == false && dist <= 350 then
-				self.oldHealth = self:Health()
-				self:SetHealth(self.oldHealth *2.5)
-				self:SetModel("models/cpthazama/scp/1048a.mdl")
-				for i = 0,self:GetBoneCount() -1 do
-					ParticleEffect("blood_impact_red",self:GetBonePosition(i),Angle(0,0,0),nil)
-				end
-				self:EmitSound("cpthazama/scp/D9341/Damage4.mp3",75,100)
-				self.IsTransformed = true
-				self:SetCollisionBounds(Vector(self.CollisionBounds.x,self.CollisionBounds.y,self.CollisionBounds.z),-(Vector(self.CollisionBounds.x,self.CollisionBounds.y,0)))
-			elseif !IsValid(self:GetEnemy()) && self:CheckForValidMemory() <= 0 && self.IsTransformed == true then
-				self:SetHealth(self.oldHealth)
-				self:SetModel("models/cpthazama/scp/1048.mdl")
-				for i = 0,self:GetBoneCount() -1 do
-					ParticleEffect("blood_impact_red",self:GetBonePosition(i),Angle(0,0,0),nil)
-				end
-				self:EmitSound("cpthazama/scp/D9341/Damage4.mp3",75,100)
-				self.IsTransformed = false
-				self:SetCollisionBounds(Vector(self.CollisionBounds.x,self.CollisionBounds.y,self.CollisionBounds.z),-(Vector(self.CollisionBounds.x,self.CollisionBounds.y,0)))
-			end
+	if self.IsPossessed then return end
+	if not self:CanPerformProcess() then return end
+	local dist = 0
+	if IsValid(self:GetEnemy()) then
+		dist = self:GetClosestPoint(self:GetEnemy())
+	end
+	if IsValid(self:GetEnemy()) && self.IsTransformed == false && dist <= 350 then
+		self.oldHealth = self:Health()
+		self:SetHealth(self.oldHealth * 2.5)
+		self:SetModel("models/cpthazama/scp/1048a.mdl")
+		for i = 0,self:GetBoneCount() -1 do
+			ParticleEffect("blood_impact_red",self:GetBonePosition(i),Angle(0,0,0),nil)
 		end
+		self:EmitSound("cpthazama/scp/D9341/Damage4.mp3",75,100)
+		self.IsTransformed = true
+		self:SetCollisionBounds(Vector(self.CollisionBounds.x,self.CollisionBounds.y,self.CollisionBounds.z),-(Vector(self.CollisionBounds.x,self.CollisionBounds.y,0)))
+	elseif not IsValid(self:GetEnemy()) && self:CheckForValidMemory() <= 0 && self.IsTransformed == true then
+		self:SetHealth(self.oldHealth)
+		self:SetModel("models/cpthazama/scp/1048.mdl")
+		for i = 0,self:GetBoneCount() -1 do
+			ParticleEffect("blood_impact_red",self:GetBonePosition(i),Angle(0,0,0),nil)
+		end
+		self:EmitSound("cpthazama/scp/D9341/Damage4.mp3",75,100)
+		self.IsTransformed = false
+		self:SetCollisionBounds(Vector(self.CollisionBounds.x,self.CollisionBounds.y,self.CollisionBounds.z),-(Vector(self.CollisionBounds.x,self.CollisionBounds.y,0)))
 	end
 end
 ---------------------------------------------------------------------------------------------------------------------------------------------
@@ -117,7 +113,7 @@ function ENT:Possess_Secondary(possessor)
 	if self:CanPerformProcess() then
 		if self.IsTransformed == false then
 			self.oldHealth = self:Health()
-			self:SetHealth(self.oldHealth *2.5)
+			self:SetHealth(self.oldHealth * 2.5)
 			self:SetModel("models/cpthazama/scp/1048a.mdl")
 			for i = 0,self:GetBoneCount() -1 do
 				ParticleEffect("blood_impact_red",self:GetBonePosition(i),Angle(0,0,0),nil)
@@ -141,7 +137,7 @@ end
 function ENT:DoAttack()
 	if self:CanPerformProcess() == false then return end
 	if self.IsTransformed == false then return end
-	if !self.IsPossessed && (IsValid(self:GetEnemy()) && !self:GetEnemy():Visible(self)) then return end
+	if not self.IsPossessed && (IsValid(self:GetEnemy()) && not self:GetEnemy():Visible(self)) then return end
 	self:StopCompletely()
 	self:PlayAnimation("Attack",2)
 	self:PlaySound("Attack")
@@ -149,11 +145,11 @@ function ENT:DoAttack()
 	local attack_time = 0.5
 	local hitents = {}
 	for i = 1,16 do
-		attack_time = attack_time +0.5
+		attack_time = attack_time + 0.5
 		timer.Simple(attack_time,function()
 			if self:IsValid() then
 				for _,v in ipairs(ents.FindInSphere(self:GetPos(),self.MeleeAttackDamageDistance)) do
-					if v:IsValid() && ((v:IsPlayer() && v:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0 && v.IsPossessing == false) || (v:IsNPC() && v != self && v.Faction != self.Faction && v:Disposition(self) != D_LI)) then
+					if v:IsValid() && ((v:IsPlayer() && v:Alive() && GetConVar("ai_ignoreplayers"):GetInt() == 0 && v.IsPossessing == false) || (v:IsNPC() && v ~= self && v.Faction ~= self.Faction && v:Disposition(self) ~= D_LI)) then
 						v:TakeDamage(8,self)
 						table.insert(hitents,v)
 					end
@@ -167,12 +163,11 @@ end
 ---------------------------------------------------------------------------------------------------------------------------------------------
 function ENT:HandleSchedules(enemy,dist,nearest,disp)
 	if self.IsPossessed then return end
-	if(disp == D_HT) then
-		if self.IsTransformed && nearest <= self.MeleeAttackDistance && self:FindInCone(enemy,self.MeleeAngle) then
-			self:DoAttack()
-		end
-		if self:CanPerformProcess() then
-			self:ChaseEnemy()
-		end
+	if disp ~= D_HT then return end
+	if self.IsTransformed && nearest <= self.MeleeAttackDistance && self:FindInCone(enemy,self.MeleeAngle) then
+		self:DoAttack()
+	end
+	if self:CanPerformProcess() then
+		self:ChaseEnemy()
 	end
 end
